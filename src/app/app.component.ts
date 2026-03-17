@@ -1,13 +1,19 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import{ CommonModule} from '@angular/common';
+import { RouterOutlet,  } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { HeaderComponent } from '../header/header.component';
+
+
+
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [  RouterOutlet,FormsModule,CommonModule,HeaderComponent ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'my-angular-tutorial';
+ 
 }
