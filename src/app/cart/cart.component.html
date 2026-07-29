@@ -9,8 +9,9 @@
 
   <div class="cart-grid">
     <div class="panel">
+      <div class="alert" *ngIf="message()">{{ message() }}</div>
       <div class="cart-item" *ngFor="let item of items()">
-        <img [src]="item.image" [alt]="item.name" />
+        <img [src]="item.image" [alt]="item.name" title="{{ item.name }}" />
         <div class="item-details">
           <h3>{{ item.name }}</h3>
           <p>${{ item.price }} each</p>
@@ -37,10 +38,10 @@
 
       <label class="coupon-box" for="coupon">
         <span>Coupon Code</span>
-        <input id="coupon" type="text" [(ngModel)]="coupon" placeholder="Enter code" />
+        <input id="coupon" type="text" [value]="coupon()" (input)="coupon.set($any($event.target).value)" placeholder="Enter code" />
       </label>
       <button type="button" class="primary-btn" (click)="applyCoupon()">Apply Coupon</button>
-      <button type="button" class="primary-btn alt">Checkout</button>
+      <button type="button" class="primary-btn alt" (click)="checkout()">Checkout</button>
     </div>
   </div>
 </section>

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 import { SellerService } from '../services/seller.service';
 
 interface SellerAuthPayload {
@@ -28,7 +29,7 @@ export class SellerAuthComponent {
     password: ''
   };
 
-  constructor(private seller: SellerService) {}
+  constructor(private seller: SellerService, private router: Router) {}
 
   toggleMode(): void {
     this.isLoginMode.update((value) => !value);
@@ -54,11 +55,15 @@ export class SellerAuthComponent {
       name: this.isLoginMode() ? undefined : this.authForm.name
     };
 
-    this.seller.userSignup(payload).subscribe({
-      next: () => {
-        this.message.set(this.isLoginMode() ? 'Welcome back! You are logged in.' : 'Account created successfully.');
-        this.isError.set(false);
+    this.seller.userSignup(payload as unknown as Record<string, unknown>).subscribe({
+      next: (result) => {
+        const response = result as { success?: boolean; message?: string } | null;
+        this.message.set(response?.message ?? (this.isLoginMode() ? 'Welcome back! You are logged in.' : 'Account created successfully.'));
+        this.isError.set(response?.success === false);
         this.isSubmitting.set(false);
+        if (response?.success !== false) {
+          this.router.navigate(['/seller-dashboard']);
+        }
       },
       error: () => {
         this.message.set('Unable to complete the request right now.');

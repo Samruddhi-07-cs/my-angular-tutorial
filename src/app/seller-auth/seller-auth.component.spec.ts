@@ -1,5 +1,5 @@
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { SellerAuthComponent } from './seller-auth.component';
 
 describe('SellerAuthComponent', () => {
@@ -8,10 +8,10 @@ describe('SellerAuthComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SellerAuthComponent]
+      imports: [SellerAuthComponent, HttpClientTestingModule]
     })
     .compileComponents();
-    
+
     fixture = TestBed.createComponent(SellerAuthComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

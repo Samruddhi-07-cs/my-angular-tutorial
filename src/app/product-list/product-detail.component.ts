@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { CartService } from '../services/cart.service';
 import { SellerService } from '../services/seller.service';
 
 interface ProductDetail {
@@ -34,7 +35,7 @@ export class ProductDetailComponent implements OnInit {
   readonly product = signal<ProductDetail | null>(null);
   readonly isLoading = signal(false);
 
-  constructor(private route: ActivatedRoute, private seller: SellerService) {}
+  constructor(private route: ActivatedRoute, private seller: SellerService, private cartService: CartService) {}
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -44,8 +45,8 @@ export class ProductDetailComponent implements OnInit {
       next: (result) => {
         const items = (result ?? []) as ProductPayload[];
         const selected = items.find((item) => item.id === id);
-        this.product.set(selected ? {
-          id: selected.id ?? id,
+        this.product.set(selected && selected.id !== undefined ? {
+          id: selected.id,
           name: selected.name,
           price: selected.price,
           category: selected.category,
@@ -59,6 +60,21 @@ export class ProductDetailComponent implements OnInit {
         this.product.set(null);
         this.isLoading.set(false);
       }
+    });
+  }
+
+  addToCart(): void {
+    const current = this.product();
+    if (!current) {
+      return;
+    }
+
+    this.cartService.addToCart({
+      id: current.id,
+      name: current.name,
+      price: current.price,
+      image: current.image,
+      category: current.category
     });
   }
 }

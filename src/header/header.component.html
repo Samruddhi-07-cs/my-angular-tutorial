@@ -7,7 +7,7 @@
 
     <label class="search-shell" for="global-search">
       <span class="material-icons">search</span>
-      <input id="global-search" type="text" placeholder="Search for products, brands and deals" />
+      <input id="global-search" type="text" placeholder="Search for products, brands and deals" [value]="searchQuery()" (input)="searchQuery.set($any($event.target).value)" (keyup.enter)="goToSearch()" />
     </label>
 
     <button class="menu-toggle" type="button" (click)="toggleMenu()" aria-label="Toggle navigation">
@@ -18,9 +18,10 @@
       <a routerLink="/" (click)="closeMenu()">Home</a>
       <a routerLink="/" (click)="closeMenu()">Categories</a>
       <a routerLink="/seller-auth" (click)="closeMenu()">Seller</a>
-      <a routerLink="/" (click)="closeMenu()">Wishlist</a>
+      <a routerLink="/seller-dashboard" (click)="closeMenu()">Dashboard</a>
+      <a routerLink="/wishlist" (click)="closeMenu()">Wishlist ({{ wishlistCount().length }})</a>
       <a routerLink="/" (click)="closeMenu()" class="nav-pill">Login / Profile</a>
-      <a routerLink="/" (click)="closeMenu()" class="cart-link">
+      <a routerLink="/cart" (click)="closeMenu()" class="cart-link">
         <span class="material-icons">shopping_cart</span>
         Cart <strong>({{ cartCount() }})</strong>
       </a>

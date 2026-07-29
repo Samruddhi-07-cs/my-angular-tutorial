@@ -1,0 +1,30 @@
+<section class="wishlist-shell">
+  <div class="wishlist-header">
+    <div>
+      <p class="eyebrow">Wishlist</p>
+      <h1>Your saved favorites</h1>
+    </div>
+    <a routerLink="/products" class="ghost-link">Browse products</a>
+  </div>
+
+  <div class="wishlist-grid" *ngIf="items().length; else emptyTpl">
+    <article class="product-card" *ngFor="let item of items()">
+      <img [src]="item.image" [alt]="item.name" title="{{ item.name }}" />
+      <div class="product-body">
+        <p class="product-category">{{ item.category || 'Wishlist' }}</p>
+        <h3>{{ item.name }}</h3>
+        <div class="product-footer">
+          <strong>${{ item.price }}</strong>
+          <div class="product-footer-actions">
+            <button type="button" class="card-btn" (click)="addToCart(item.id)">Add to Cart</button>
+            <button type="button" class="card-btn secondary" (click)="removeFromWishlist(item.id)">Remove</button>
+          </div>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <ng-template #emptyTpl>
+    <div class="empty-state">Your wishlist is empty. Save a product to revisit it later.</div>
+  </ng-template>
+</section>

@@ -2,14 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-
-interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  quantity: number;
-  image: string;
-}
+import { CartService, CartItem } from '../services/cart.service';
 
 @Component({
   selector: 'app-cart',
@@ -19,12 +12,11 @@ interface CartItem {
   styleUrls: ['./cart.component.css']
 })
 export class CartComponent {
-  readonly items = signal<CartItem[]>([
-    { id: 1, name: 'Noise Smart Watch', price: 89, quantity: 1, image: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=900&q=80' },
-    { id: 2, name: 'Aurora Headphones', price: 129, quantity: 2, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=80' }
-  ]);
-
+  readonly items = this.cartService.items;
   readonly coupon = signal('');
+  readonly message = signal<string | null>(null);
+
+  constructor(private cartService: CartService) {}
 
   get subtotal(): number {
     return this.items().reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -47,20 +39,39 @@ export class CartComponent {
   }
 
   increaseQuantity(id: number): void {
-    this.items.update((current) => current.map((item) => item.id === id ? { ...item, quantity: item.quantity + 1 } : item));
+    this.cartService.increaseQuantity(id);
   }
 
   decreaseQuantity(id: number): void {
-    this.items.update((current) => current.map((item) => item.id === id && item.quantity > 1 ? { ...item, quantity: item.quantity - 1 } : item));
+    this.cartService.decreaseQuantity(id);
   }
 
   removeItem(id: number): void {
-    this.items.update((current) => current.filter((item) => item.id !== id));
+    this.cartService.removeItem(id);
   }
 
   applyCoupon(): void {
-    if (!this.coupon().trim()) {
+    const code = this.coupon().trim().toLowerCase();
+    if (!code) {
+      this.message.set('Enter a coupon code to continue.');
       return;
     }
+
+    if (code === 'save10') {
+      this.message.set('Coupon applied successfully.');
+      return;
+    }
+
+    this.message.set('That coupon code is invalid.');
+  }
+
+  checkout(): void {
+    if (!this.items().length) {
+      this.message.set('Your cart is empty. Add a product before checkout.');
+      return;
+    }
+
+    this.message.set('Checkout is ready. Your order will be processed shortly.');
   }
 }
+

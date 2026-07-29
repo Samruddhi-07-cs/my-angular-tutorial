@@ -5,7 +5,7 @@
       <h1>{{ heroSlides[currentIndex].title }}</h1>
       <p>{{ heroSlides[currentIndex].subtitle }}</p>
       <div class="hero-actions">
-        <a routerLink="/" class="btn btn-primary">Shop Now</a>
+        <a routerLink="/products" class="btn btn-primary">Shop Now</a>
         <a routerLink="/seller-auth" class="btn btn-secondary">Become a Seller</a>
       </div>
     </div>
@@ -27,7 +27,7 @@
 <section class="section-block">
   <div class="section-head">
     <h2>Featured Categories</h2>
-    <a routerLink="/">See all</a>
+    <a routerLink="/products">See all</a>
   </div>
   <div class="category-grid">
     <article class="category-card" *ngFor="let category of categories">
@@ -41,19 +41,22 @@
 <section class="section-block">
   <div class="section-head">
     <h2>Trending Products</h2>
-    <a routerLink="/">View more</a>
+    <a routerLink="/products">View more</a>
   </div>
   <div class="product-grid">
     <article class="product-card" *ngFor="let product of featuredProducts">
       <span class="product-tag">{{ product.tag }}</span>
-      <img [src]="product.image" [alt]="product.title" />
+      <img [src]="product.image" [alt]="product.title" title="{{ product.title }}" />
       <div class="product-body">
         <h3>{{ product.title }}</h3>
         <div class="product-meta">
           <span>⭐ 4.8</span>
           <strong>{{ product.price }}</strong>
         </div>
-        <button type="button" class="card-btn">Add to Cart</button>
+        <div class="product-footer-actions">
+          <button type="button" class="card-btn" (click)="addToCart(product)">Add to Cart</button>
+          <button type="button" class="card-btn secondary" (click)="toggleWishlist(product)">{{ isWishlisted(product) ? '♥' : '♡' }}</button>
+        </div>
       </div>
     </article>
   </div>
@@ -62,19 +65,22 @@
 <section class="section-block">
   <div class="section-head">
     <h2>Best Sellers</h2>
-    <a routerLink="/">Explore</a>
+    <a routerLink="/products">Explore</a>
   </div>
   <div class="product-grid">
     <article class="product-card" *ngFor="let product of bestSellers">
       <span class="product-tag">{{ product.tag }}</span>
-      <img [src]="product.image" [alt]="product.title" />
+      <img [src]="product.image" [alt]="product.title" title="{{ product.title }}" />
       <div class="product-body">
         <h3>{{ product.title }}</h3>
         <div class="product-meta">
           <span>⭐ 4.9</span>
           <strong>{{ product.price }}</strong>
         </div>
-        <button type="button" class="card-btn">Add to Cart</button>
+        <div class="product-footer-actions">
+          <button type="button" class="card-btn" (click)="addToCart(product)">Add to Cart</button>
+          <button type="button" class="card-btn secondary" (click)="toggleWishlist(product)">{{ isWishlisted(product) ? '♥' : '♡' }}</button>
+        </div>
       </div>
     </article>
   </div>
@@ -86,5 +92,5 @@
     <h2>Save big on your first order</h2>
     <p>Enjoy exclusive deals, free shipping, and easy returns on your favorite essentials.</p>
   </div>
-  <a routerLink="/" class="btn btn-primary">Grab Offer</a>
+  <a routerLink="/products" class="btn btn-primary">Grab Offer</a>
 </section>

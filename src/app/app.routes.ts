@@ -3,6 +3,8 @@ import { HomeComponent } from './home/home.component';
 import { ProductListComponent } from './product-list/product-list.component';
 import { SellerAuthComponent } from './seller-auth/seller-auth.component';
 import { CartComponent } from './cart/cart.component';
+import { AddProductComponent } from './add-product/add-product.component';
+import { WishlistComponent } from './wishlist/wishlist.component';
 
 export const routes: Routes = [
   {
@@ -24,5 +26,13 @@ export const routes: Routes = [
   {
     path: 'seller-auth',
     component: SellerAuthComponent
+  },
+  {
+    path: 'seller-dashboard',
+    component: AddProductComponent
+  },
+  {
+    path: 'wishlist',
+    component: WishlistComponent
   }
 ];

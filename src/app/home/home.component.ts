@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { CartService } from '../services/cart.service';
+import { WishlistService } from '../services/wishlist.service';
 
 interface Category {
   name: string;
@@ -23,6 +25,7 @@ interface ProductCard {
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent {
+  constructor(private cartService: CartService, private wishlistService: WishlistService) {}
   readonly heroSlides = [
     {
       title: 'Discover exciting deals',
@@ -68,6 +71,30 @@ export class HomeComponent {
 
   prevSlide(): void {
     this.currentIndex = (this.currentIndex - 1 + this.heroSlides.length) % this.heroSlides.length;
+  }
+
+  addToCart(product: ProductCard): void {
+    this.cartService.addToCart({
+      id: product.title.length,
+      name: product.title,
+      price: Number(product.price.replace(/[^\d.]/g, '')),
+      image: product.image,
+      category: 'Featured'
+    });
+  }
+
+  toggleWishlist(product: ProductCard): void {
+    this.wishlistService.toggleWishlist({
+      id: product.title.length,
+      name: product.title,
+      price: Number(product.price.replace(/[^\d.]/g, '')),
+      image: product.image,
+      category: 'Featured'
+    });
+  }
+
+  isWishlisted(product: ProductCard): boolean {
+    return this.wishlistService.isInWishlist(product.title.length);
   }
 }
 
