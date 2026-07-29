@@ -1,13 +1,29 @@
-<nav class="nav">
-    <h1>E-COMM</h1>
-    <div class="nav-search"> 
-        <input type="text" placeholder="search for products"/>
-        <button>Search</button>
+<header class="topbar">
+  <nav class="navbar-shell" aria-label="Primary navigation">
+    <a class="brand" routerLink="/" (click)="closeMenu()">
+      <span class="brand-mark">N</span>
+      <span class="brand-text"><strong>NovaCart</strong><small>Smart shopping</small></span>
+    </a>
+
+    <label class="search-shell" for="global-search">
+      <span class="material-icons">search</span>
+      <input id="global-search" type="text" placeholder="Search for products, brands and deals" />
+    </label>
+
+    <button class="menu-toggle" type="button" (click)="toggleMenu()" aria-label="Toggle navigation">
+      <span class="material-icons">{{ isMenuOpen() ? 'close' : 'menu' }}</span>
+    </button>
+
+    <div class="nav-links" [class.open]="isMenuOpen()">
+      <a routerLink="/" (click)="closeMenu()">Home</a>
+      <a routerLink="/" (click)="closeMenu()">Categories</a>
+      <a routerLink="/seller-auth" (click)="closeMenu()">Seller</a>
+      <a routerLink="/" (click)="closeMenu()">Wishlist</a>
+      <a routerLink="/" (click)="closeMenu()" class="nav-pill">Login / Profile</a>
+      <a routerLink="/" (click)="closeMenu()" class="cart-link">
+        <span class="material-icons">shopping_cart</span>
+        Cart <strong>({{ cartCount() }})</strong>
+      </a>
     </div>
-    <ul>
-        <li><a routerLink="/">Home</a></li>
-        <li><a routerLink="/seller-auth">Seller</a></li>
-        <li><a href="#">Login</a></li>
-        <li><a href="#">Cart(0)</a></li>
-    </ul>
-</nav>
+  </nav>
+</header>

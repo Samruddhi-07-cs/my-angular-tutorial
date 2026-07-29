@@ -1,0 +1,46 @@
+<section class="cart-shell">
+  <div class="cart-header">
+    <div>
+      <p class="eyebrow">Shopping Cart</p>
+      <h1>Your selected items</h1>
+    </div>
+    <a routerLink="/products" class="ghost-link">Continue shopping</a>
+  </div>
+
+  <div class="cart-grid">
+    <div class="panel">
+      <div class="cart-item" *ngFor="let item of items()">
+        <img [src]="item.image" [alt]="item.name" />
+        <div class="item-details">
+          <h3>{{ item.name }}</h3>
+          <p>${{ item.price }} each</p>
+          <div class="qty-controls">
+            <button type="button" (click)="decreaseQuantity(item.id)">-</button>
+            <span>{{ item.quantity }}</span>
+            <button type="button" (click)="increaseQuantity(item.id)">+</button>
+          </div>
+        </div>
+        <div class="item-actions">
+          <strong>${{ item.price * item.quantity }}</strong>
+          <button type="button" class="remove-btn" (click)="removeItem(item.id)">Remove</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel summary-panel">
+      <h2>Order Summary</h2>
+      <div class="summary-row"><span>Subtotal</span><strong>${{ subtotal.toFixed(2) }}</strong></div>
+      <div class="summary-row"><span>GST (12%)</span><strong>${{ gst.toFixed(2) }}</strong></div>
+      <div class="summary-row"><span>Shipping</span><strong>${{ shipping.toFixed(2) }}</strong></div>
+      <div class="summary-row"><span>Discount</span><strong>-${{ discount.toFixed(2) }}</strong></div>
+      <div class="summary-row total"><span>Total</span><strong>${{ total.toFixed(2) }}</strong></div>
+
+      <label class="coupon-box" for="coupon">
+        <span>Coupon Code</span>
+        <input id="coupon" type="text" [(ngModel)]="coupon" placeholder="Enter code" />
+      </label>
+      <button type="button" class="primary-btn" (click)="applyCoupon()">Apply Coupon</button>
+      <button type="button" class="primary-btn alt">Checkout</button>
+    </div>
+  </div>
+</section>

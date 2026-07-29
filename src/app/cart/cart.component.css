@@ -1,0 +1,129 @@
+.cart-shell {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1rem 0 2rem;
+}
+
+.cart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.cart-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 1rem;
+}
+
+.panel {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 22px;
+  padding: 1rem;
+  box-shadow: 0 10px 30px rgba(15,23,42,0.06);
+}
+
+.cart-item {
+  display: grid;
+  grid-template-columns: 90px 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.cart-item img {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+.qty-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.qty-controls button,
+.remove-btn,
+.primary-btn {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.5rem 0.8rem;
+  cursor: pointer;
+}
+
+.remove-btn {
+  background: #fee2e2;
+  color: #dc2626;
+  margin-top: 0.4rem;
+}
+
+.summary-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  color: #475569;
+}
+
+.summary-row.total {
+  padding-top: 0.7rem;
+  border-top: 1px solid #e2e8f0;
+  font-weight: 700;
+  color: #111827;
+}
+
+.coupon-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  color: #475569;
+}
+
+.coupon-box input {
+  border: 1px solid #dbe2ea;
+  border-radius: 10px;
+  padding: 0.7rem 0.8rem;
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+  color: #fff;
+}
+
+.primary-btn.alt {
+  background: linear-gradient(135deg, #0f172a, #334155);
+}
+
+.ghost-link {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+@media (max-width: 800px) {
+  .cart-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .cart-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cart-item {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,1 +1,90 @@
-<h1>home page</h1>
+<section class="hero-section">
+  <div class="hero-card">
+    <div class="hero-copy">
+      <span class="pill">{{ heroSlides[currentIndex].badge }}</span>
+      <h1>{{ heroSlides[currentIndex].title }}</h1>
+      <p>{{ heroSlides[currentIndex].subtitle }}</p>
+      <div class="hero-actions">
+        <a routerLink="/" class="btn btn-primary">Shop Now</a>
+        <a routerLink="/seller-auth" class="btn btn-secondary">Become a Seller</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="visual-glow"></div>
+      <div class="visual-card">
+        <p>Top Rated</p>
+        <h3>Premium essentials for modern living</h3>
+      </div>
+    </div>
+  </div>
+
+  <div class="slider-controls">
+    <button type="button" (click)="prevSlide()" aria-label="Previous slide">&#10094;</button>
+    <button type="button" (click)="nextSlide()" aria-label="Next slide">&#10095;</button>
+  </div>
+</section>
+
+<section class="section-block">
+  <div class="section-head">
+    <h2>Featured Categories</h2>
+    <a routerLink="/">See all</a>
+  </div>
+  <div class="category-grid">
+    <article class="category-card" *ngFor="let category of categories">
+      <span class="material-icons">{{ category.icon }}</span>
+      <h3>{{ category.name }}</h3>
+      <p>{{ category.description }}</p>
+    </article>
+  </div>
+</section>
+
+<section class="section-block">
+  <div class="section-head">
+    <h2>Trending Products</h2>
+    <a routerLink="/">View more</a>
+  </div>
+  <div class="product-grid">
+    <article class="product-card" *ngFor="let product of featuredProducts">
+      <span class="product-tag">{{ product.tag }}</span>
+      <img [src]="product.image" [alt]="product.title" />
+      <div class="product-body">
+        <h3>{{ product.title }}</h3>
+        <div class="product-meta">
+          <span>⭐ 4.8</span>
+          <strong>{{ product.price }}</strong>
+        </div>
+        <button type="button" class="card-btn">Add to Cart</button>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="section-block">
+  <div class="section-head">
+    <h2>Best Sellers</h2>
+    <a routerLink="/">Explore</a>
+  </div>
+  <div class="product-grid">
+    <article class="product-card" *ngFor="let product of bestSellers">
+      <span class="product-tag">{{ product.tag }}</span>
+      <img [src]="product.image" [alt]="product.title" />
+      <div class="product-body">
+        <h3>{{ product.title }}</h3>
+        <div class="product-meta">
+          <span>⭐ 4.9</span>
+          <strong>{{ product.price }}</strong>
+        </div>
+        <button type="button" class="card-btn">Add to Cart</button>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="section-block offer-banner">
+  <div>
+    <p class="pill">Special Offers</p>
+    <h2>Save big on your first order</h2>
+    <p>Enjoy exclusive deals, free shipping, and easy returns on your favorite essentials.</p>
+  </div>
+  <a routerLink="/" class="btn btn-primary">Grab Offer</a>
+</section>

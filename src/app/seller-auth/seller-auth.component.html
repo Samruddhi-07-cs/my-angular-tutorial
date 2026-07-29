@@ -1,11 +1,34 @@
-<div class="seller-auth">
-    <div class="sign-up">
-        <h1>Seller Sign-up</h1>
-        <form #sellerSignUp="ngForm"(ngSubmit)="SignUp(sellerSignUp.value)"class="common-form">
-            <input class="form-input" type="text" ngModel  name="name"  placeholder="Enter Name">
-            <input class="form-input" type="password" name="password" ngModel placeholder="Password">
-            <input class="form-input" type="text" name="email" ngModel placeholder="Enter Email">
-            <button class="form-button">SignUp</button>
-        </form>    
+<section class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-hero">
+      <p class="eyebrow">Seller Access</p>
+      <h1>{{ isLoginMode() ? 'Welcome back' : 'Create your seller account' }}</h1>
+      <p>Manage products, grow your catalog, and reach new customers with a polished storefront.</p>
     </div>
-</div>
+
+    <form class="auth-form" #sellerForm="ngForm" (ngSubmit)="submit(sellerForm)">
+      <div class="form-switch">
+        <button type="button" [class.active]="isLoginMode()" (click)="toggleMode()">Login</button>
+        <button type="button" [class.active]="!isLoginMode()" (click)="toggleMode()">Sign Up</button>
+      </div>
+
+      <div class="alert" [class.error]="isError()" *ngIf="message()">
+        {{ message() }}
+      </div>
+
+      <input *ngIf="!isLoginMode()" type="text" name="name" [(ngModel)]="authForm.name" placeholder="Enter Name" required />
+      <input type="email" name="email" [(ngModel)]="authForm.email" placeholder="Enter Email" required email />
+
+      <label class="password-field">
+        <input [type]="showPassword() ? 'text' : 'password'" name="password" [(ngModel)]="authForm.password" placeholder="Enter Password" required minlength="6" />
+        <button type="button" (click)="togglePasswordVisibility()">
+          {{ showPassword() ? 'Hide' : 'Show' }}
+        </button>
+      </label>
+
+      <button type="submit" class="primary-btn" [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Please wait...' : isLoginMode() ? 'Login' : 'Create Account' }}
+      </button>
+    </form>
+  </div>
+</section>

@@ -1,16 +1,28 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
+import { ProductListComponent } from './product-list/product-list.component';
 import { SellerAuthComponent } from './seller-auth/seller-auth.component';
+import { CartComponent } from './cart/cart.component';
 
 export const routes: Routes = [
-    {
-        path:'',
-        component: HomeComponent
-    },
-    {
-        path:'seller-auth',
-        component: SellerAuthComponent
-    }
-   
-
-]
+  {
+    path: '',
+    component: HomeComponent
+  },
+  {
+    path: 'products',
+    component: ProductListComponent
+  },
+  {
+    path: 'products/:id',
+    loadComponent: () => import('./product-list/product-detail.component').then((m) => m.ProductDetailComponent)
+  },
+  {
+    path: 'cart',
+    component: CartComponent
+  },
+  {
+    path: 'seller-auth',
+    component: SellerAuthComponent
+  }
+];
