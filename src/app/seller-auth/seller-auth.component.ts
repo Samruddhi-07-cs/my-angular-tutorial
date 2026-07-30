@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
-import { SellerService } from '../services/seller.service';
+import { AuthService } from '../services/auth.service';
 
 interface SellerAuthPayload {
   name?: string;
@@ -29,7 +29,7 @@ export class SellerAuthComponent {
     password: ''
   };
 
-  constructor(private seller: SellerService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   toggleMode(): void {
     this.isLoginMode.update((value) => !value);
@@ -55,13 +55,16 @@ export class SellerAuthComponent {
       name: this.isLoginMode() ? undefined : this.authForm.name
     };
 
-    this.seller.userSignup(payload as unknown as Record<string, unknown>).subscribe({
-      next: (result) => {
-        const response = result as { success?: boolean; message?: string } | null;
-        this.message.set(response?.message ?? (this.isLoginMode() ? 'Welcome back! You are logged in.' : 'Account created successfully.'));
-        this.isError.set(response?.success === false);
+    const request = this.isLoginMode()
+      ? this.authService.login(this.authForm.email, this.authForm.password)
+      : this.authService.register(this.authForm.name ?? '', this.authForm.email, this.authForm.password);
+
+    request.subscribe({
+      next: (response) => {
+        this.message.set(response.message);
+        this.isError.set(!response.success);
         this.isSubmitting.set(false);
-        if (response?.success !== false) {
+        if (response.success) {
           this.router.navigate(['/seller-dashboard']);
         }
       },

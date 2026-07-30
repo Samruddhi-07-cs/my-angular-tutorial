@@ -1,0 +1,5 @@
+.profile-shell { padding: 2rem 1.25rem 4rem; max-width: 900px; margin: 0 auto; }
+.profile-card { background: #fff; border-radius: 24px; padding: 2rem; box-shadow: 0 18px 55px rgba(15, 23, 42, 0.08); }
+.eyebrow { color: #2563eb; text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.8rem; font-weight: 700; }
+.ghost-link { color: #2563eb; font-weight: 600; text-decoration: none; }
+.empty-state { text-align: center; }

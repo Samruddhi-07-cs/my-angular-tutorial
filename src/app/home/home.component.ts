@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CartService } from '../services/cart.service';
 import { WishlistService } from '../services/wishlist.service';
 
@@ -25,7 +25,7 @@ interface ProductCard {
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent {
-  constructor(private cartService: CartService, private wishlistService: WishlistService) {}
+  constructor(private cartService: CartService, private wishlistService: WishlistService, private router: Router) {}
   readonly heroSlides = [
     {
       title: 'Discover exciting deals',
@@ -95,6 +95,10 @@ export class HomeComponent {
 
   isWishlisted(product: ProductCard): boolean {
     return this.wishlistService.isInWishlist(product.title.length);
+  }
+
+  openCategory(categoryName: string): void {
+    this.router.navigate(['/products'], { queryParams: { category: categoryName } });
   }
 }
 

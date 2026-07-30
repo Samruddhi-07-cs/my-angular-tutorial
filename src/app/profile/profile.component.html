@@ -1,0 +1,16 @@
+<section class="profile-shell">
+  <div class="profile-card" *ngIf="authService.currentUser(); else guestTpl">
+    <p class="eyebrow">Seller Profile</p>
+    <h1>{{ authService.currentUser()?.name }}</h1>
+    <p><strong>Email:</strong> {{ authService.currentUser()?.email }}</p>
+    <a routerLink="/seller-dashboard" class="ghost-link">Go to dashboard</a>
+  </div>
+
+  <ng-template #guestTpl>
+    <div class="profile-card empty-state">
+      <p class="eyebrow">No profile found</p>
+      <h1>Please log in to view your profile.</h1>
+      <a routerLink="/seller-auth" class="ghost-link">Go to login</a>
+    </div>
+  </ng-template>
+</section>

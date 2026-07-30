@@ -30,7 +30,7 @@
     <a routerLink="/products">See all</a>
   </div>
   <div class="category-grid">
-    <article class="category-card" *ngFor="let category of categories">
+    <article class="category-card" *ngFor="let category of categories" (click)="openCategory(category.name)">
       <span class="material-icons">{{ category.icon }}</span>
       <h3>{{ category.name }}</h3>
       <p>{{ category.description }}</p>

@@ -30,41 +30,52 @@ export class SellerService {
 
   constructor(private http: HttpClient) {}
 
-  userSignup(data: Record<string, unknown>): Observable<unknown> {
-    const email = String(data['email'] ?? '').trim().toLowerCase();
-    const password = String(data['password'] ?? '').trim();
-    const name = String(data['name'] ?? '').trim();
-
+  authenticateSeller(email: string, password: string): Observable<{ success: boolean; message: string; seller?: SellerRecord }> {
     if (!email || !password) {
       return of({ success: false, message: 'Please provide an email and password.' });
     }
 
     const sellers = this.readSellers();
-    const hasName = name.length > 0;
-
-    if (hasName) {
-      const isDuplicate = sellers.some((seller) => seller.email.toLowerCase() === email);
-      if (isDuplicate) {
-        return of({ success: false, message: 'An account with this email already exists.' });
-      }
-
-      const seller: SellerRecord = {
-        id: this.generateId(),
-        name,
-        email,
-        password
-      };
-      sellers.push(seller);
-      this.persistSellers(sellers);
-      return of({ success: true, message: 'Account created successfully.', seller });
-    }
-
     const seller = sellers.find((entry) => entry.email.toLowerCase() === email && entry.password === password);
     if (seller) {
       return of({ success: true, message: 'Welcome back! You are logged in.', seller });
     }
 
     return of({ success: false, message: 'Invalid email or password.' });
+  }
+
+  registerSeller(name: string, email: string, password: string): Observable<{ success: boolean; message: string; seller?: SellerRecord }> {
+    if (!email || !password || !name) {
+      return of({ success: false, message: 'Please provide your name, email, and password.' });
+    }
+
+    const sellers = this.readSellers();
+    const isDuplicate = sellers.some((seller) => seller.email.toLowerCase() === email.toLowerCase());
+    if (isDuplicate) {
+      return of({ success: false, message: 'An account with this email already exists.' });
+    }
+
+    const seller: SellerRecord = {
+      id: this.generateId(),
+      name,
+      email: email.toLowerCase(),
+      password
+    };
+    sellers.push(seller);
+    this.persistSellers(sellers);
+    return of({ success: true, message: 'Account created successfully.', seller });
+  }
+
+  userSignup(data: Record<string, unknown>): Observable<unknown> {
+    const email = String(data['email'] ?? '').trim().toLowerCase();
+    const password = String(data['password'] ?? '').trim();
+    const name = String(data['name'] ?? '').trim();
+
+    if (name.length > 0) {
+      return this.registerSeller(name, email, password);
+    }
+
+    return this.authenticateSeller(email, password);
   }
 
   addProduct(data: ProductPayload): Observable<unknown> {

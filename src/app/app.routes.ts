@@ -5,6 +5,8 @@ import { SellerAuthComponent } from './seller-auth/seller-auth.component';
 import { CartComponent } from './cart/cart.component';
 import { AddProductComponent } from './add-product/add-product.component';
 import { WishlistComponent } from './wishlist/wishlist.component';
+import { ProfileComponent } from './profile/profile.component';
+import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -29,10 +31,16 @@ export const routes: Routes = [
   },
   {
     path: 'seller-dashboard',
-    component: AddProductComponent
+    component: AddProductComponent,
+    canActivate: [AuthGuard]
   },
   {
     path: 'wishlist',
     component: WishlistComponent
+  },
+  {
+    path: 'profile',
+    component: ProfileComponent,
+    canActivate: [AuthGuard]
   }
 ];

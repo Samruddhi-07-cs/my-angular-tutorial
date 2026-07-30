@@ -33,7 +33,8 @@ export class ProductListComponent implements OnInit {
   ngOnInit(): void {
     this.route.queryParamMap.subscribe((params) => {
       const search = params.get('search') ?? '';
-      this.searchTerm.set(search);
+      const category = params.get('category') ?? '';
+      this.searchTerm.set(search || category);
       this.list();
     });
   }

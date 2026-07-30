@@ -20,7 +20,11 @@
       <a routerLink="/seller-auth" (click)="closeMenu()">Seller</a>
       <a routerLink="/seller-dashboard" (click)="closeMenu()">Dashboard</a>
       <a routerLink="/wishlist" (click)="closeMenu()">Wishlist ({{ wishlistCount().length }})</a>
-      <a routerLink="/" (click)="closeMenu()" class="nav-pill">Login / Profile</a>
+      <a *ngIf="authService.isAuthenticated(); else guestLink" [routerLink]="'/profile'" (click)="closeMenu()" class="nav-pill">Profile</a>
+      <ng-template #guestLink>
+        <a routerLink="/seller-auth" (click)="closeMenu()" class="nav-pill">Login</a>
+      </ng-template>
+      <a *ngIf="authService.isAuthenticated()" href="javascript:void(0)" (click)="logout()" class="nav-pill">Logout</a>
       <a routerLink="/cart" (click)="closeMenu()" class="cart-link">
         <span class="material-icons">shopping_cart</span>
         Cart <strong>({{ cartCount() }})</strong>
