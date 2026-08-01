@@ -33,5 +33,9 @@ export class HeaderComponent {
     this.router.navigate(['/products'], { queryParams: { search: term } });
     this.closeMenu();
   }
+  logout() {
+  this.authService.logout();
+  this.closeMenu();
+}
 }
 
