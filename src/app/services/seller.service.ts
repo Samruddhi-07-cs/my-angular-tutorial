@@ -1,17 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-
-interface ProductPayload {
-  id?: number;
-  name: string;
-  price: number;
-  category: string;
-  color: string;
-  image: string;
-  description: string;
-}
+import { Product } from '../product';
 
 interface SellerRecord {
   id: string;
@@ -24,7 +14,7 @@ interface SellerRecord {
   providedIn: 'root'
 })
 export class SellerService {
-  private readonly baseUrl = 'http://localhost:3000';
+  private readonly baseUrl = 'http://localhost:8081/api';
   private readonly productStorageKey = 'novacart-products';
   private readonly sellerStorageKey = 'novacart-sellers';
 
@@ -78,48 +68,27 @@ export class SellerService {
     return this.authenticateSeller(email, password);
   }
 
-  addProduct(data: ProductPayload): Observable<unknown> {
-    const products = this.readProducts();
-    const product: ProductPayload = { ...data, id: data.id ?? Number(this.generateId().replace(/\D/g, '').slice(0, 6)) };
-    products.push(product);
-    this.persistProducts(products);
-    return of(product);
+  addProduct(data: Product): Observable<Product> {
+    return this.http.post<Product>(`${this.baseUrl}/products`, data);
   }
 
-  updateProduct(id: number, data: ProductPayload): Observable<unknown> {
-    const products = this.readProducts();
-    const index = products.findIndex((product) => product.id === id);
-    if (index >= 0) {
-      products[index] = { ...products[index], ...data, id };
-      this.persistProducts(products);
-      return of(products[index]);
-    }
-
-    return of({ success: false, message: 'Product not found.' });
+  updateProduct(id: number, data: Product): Observable<Product> {
+    return this.http.put<Product>(`${this.baseUrl}/products/${id}`, data);
   }
 
   deleteProduct(id: number): Observable<unknown> {
-    const products = this.readProducts().filter((product) => product.id !== id);
-    this.persistProducts(products);
-    return of({ success: true, id });
+    return this.http.delete(`${this.baseUrl}/products/${id}`);
   }
 
-  productList(): Observable<ProductPayload[]> {
-    const cachedProducts = this.readProducts();
-    if (cachedProducts.length) {
-      return of(cachedProducts);
-    }
-
-    return this.http.get<ProductPayload[]>(`${this.baseUrl}/products`).pipe(
-      catchError(() => of(this.readProducts()))
-    );
+  productList(): Observable<Product[]> {
+    return this.http.get<Product[]>(`${this.baseUrl}/products`);
   }
 
   private generateId(): string {
     return Math.random().toString(36).slice(2, 10);
   }
 
-  private readProducts(): ProductPayload[] {
+  private readProducts(): Product[] {
     if (typeof window === 'undefined') {
       return this.seedProducts();
     }
@@ -132,13 +101,13 @@ export class SellerService {
     }
 
     try {
-      return JSON.parse(stored) as ProductPayload[];
+      return JSON.parse(stored) as Product[];
     } catch {
       return this.seedProducts();
     }
   }
 
-  private persistProducts(products: ProductPayload[]): void {
+  private persistProducts(products: Product[]): void {
     if (typeof window === 'undefined') {
       return;
     }
@@ -173,61 +142,61 @@ export class SellerService {
     localStorage.setItem(this.sellerStorageKey, JSON.stringify(sellers));
   }
 
-  private seedProducts(): ProductPayload[] {
+  private seedProducts(): Product[] {
     return [
       {
         id: 1,
         name: 'Noise Smart Watch',
-        price: 89,
+        description: 'Smart fitness tracking with a vivid display and long battery life.',
         category: 'Electronics',
-        color: 'Midnight',
-        image: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=900&q=80',
-        description: 'Smart fitness tracking with a vivid display and long battery life.'
+        price: 89,
+        stock: 15,
+        imageUrl: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=900&q=80'
       },
       {
         id: 2,
         name: 'Aurora Headphones',
-        price: 129,
+        description: 'Immersive sound with premium comfort for daily listening.',
         category: 'Electronics',
-        color: 'Silver',
-        image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=80',
-        description: 'Immersive sound with premium comfort for daily listening.'
+        price: 129,
+        stock: 20,
+        imageUrl: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=80'
       },
       {
         id: 3,
         name: 'Luma Lamp',
-        price: 59,
+        description: 'Minimal lighting for modern interiors and cozy evenings.',
         category: 'Home',
-        color: 'Cream',
-        image: 'https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=900&q=80',
-        description: 'Minimal lighting for modern interiors and cozy evenings.'
+        price: 59,
+        stock: 12,
+        imageUrl: 'https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=900&q=80'
       },
       {
         id: 4,
         name: 'Eco Tote Bag',
-        price: 34,
+        description: 'A durable everyday bag designed for casual errands and travel.',
         category: 'Fashion',
-        color: 'Olive',
-        image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80',
-        description: 'A durable everyday bag designed for casual errands and travel.'
+        price: 34,
+        stock: 30,
+        imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80'
       },
       {
         id: 5,
         name: 'Glow Blender',
-        price: 72,
+        description: 'High-speed blending with a sleek finish for daily smoothies.',
         category: 'Home',
-        color: 'Black',
-        image: 'https://images.unsplash.com/photo-1577563908411-5077b6dc7624?auto=format&fit=crop&w=900&q=80',
-        description: 'High-speed blending with a sleek finish for daily smoothies.'
+        price: 72,
+        stock: 8,
+        imageUrl: 'https://images.unsplash.com/photo-1577563908411-5077b6dc7624?auto=format&fit=crop&w=900&q=80'
       },
       {
         id: 6,
         name: 'Zen Chair',
-        price: 149,
+        description: 'Comfortable ergonomic seating crafted for modern spaces.',
         category: 'Home',
-        color: 'Walnut',
-        image: 'https://images.unsplash.com/photo-1519947486511-46149fa0a254?auto=format&fit=crop&w=900&q=80',
-        description: 'Comfortable ergonomic seating crafted for modern spaces.'
+        price: 149,
+        stock: 5,
+        imageUrl: 'https://images.unsplash.com/photo-1519947486511-46149fa0a254?auto=format&fit=crop&w=900&q=80'
       }
     ];
   }

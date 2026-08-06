@@ -14,9 +14,11 @@ describe('CartService', () => {
     service.addToCart({
       id: 7,
       name: 'Test Lamp',
+      description: 'A stylish desk lamp for modern interiors.',
+      category: 'Home',
       price: 42,
-      image: 'lamp.jpg',
-      category: 'Home'
+      stock: 10,
+      imageUrl: 'lamp.jpg'
     });
 
     expect(service.items().length).toBe(1);

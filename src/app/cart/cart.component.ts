@@ -38,16 +38,16 @@ export class CartComponent {
     return this.subtotal + this.gst + this.shipping - this.discount;
   }
 
-  increaseQuantity(id: number): void {
-    this.cartService.increaseQuantity(id);
+  increaseQuantity(id: number | undefined): void {
+    this.cartService.increaseQuantity(id ?? 0);
   }
 
-  decreaseQuantity(id: number): void {
-    this.cartService.decreaseQuantity(id);
+  decreaseQuantity(id: number | undefined): void {
+    this.cartService.decreaseQuantity(id ?? 0);
   }
 
-  removeItem(id: number): void {
-    this.cartService.removeItem(id);
+  removeItem(id: number | undefined): void {
+    this.cartService.removeItem(id ?? 0);
   }
 
   applyCoupon(): void {

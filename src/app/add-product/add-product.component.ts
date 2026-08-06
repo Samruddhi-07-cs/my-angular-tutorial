@@ -1,17 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
+import { Product } from '../product';
 import { SellerService } from '../services/seller.service';
-
-interface ProductPayload {
-  id?: number;
-  name: string;
-  price: number;
-  category: string;
-  color: string;
-  image: string;
-  description: string;
-}
 
 @Component({
   selector: 'app-add-product',
@@ -21,20 +12,20 @@ interface ProductPayload {
   styleUrls: ['./add-product.component.css']
 })
 export class AddProductComponent implements OnInit {
-  readonly products = signal<ProductPayload[]>([]);
+  readonly products = signal<Product[]>([]);
   readonly isLoading = signal(false);
   readonly isSubmitting = signal(false);
   readonly message = signal<string | null>(null);
   readonly isError = signal(false);
   readonly editingId = signal<number | null>(null);
 
-  draft: ProductPayload = {
+  draft: Product = {
     name: '',
-    price: 0,
+    description: '',
     category: '',
-    color: '',
-    image: '',
-    description: ''
+    price: 0,
+    stock: 0,
+    imageUrl: ''
   };
 
   constructor(private seller: SellerService) {}
@@ -66,7 +57,7 @@ export class AddProductComponent implements OnInit {
     }
 
     this.isSubmitting.set(true);
-    const payload: ProductPayload = {
+    const payload: Product = {
       ...this.draft,
       price: Number(this.draft.price)
     };
@@ -91,7 +82,7 @@ export class AddProductComponent implements OnInit {
     });
   }
 
-  editProduct(product: ProductPayload): void {
+  editProduct(product: Product): void {
     this.draft = { ...product };
     this.editingId.set(product.id ?? null);
     this.message.set('Editing product. Update the details and save.');
@@ -115,11 +106,11 @@ export class AddProductComponent implements OnInit {
   resetForm(): void {
     this.draft = {
       name: '',
-      price: 0,
+      description: '',
       category: '',
-      color: '',
-      image: '',
-      description: ''
+      price: 0,
+      stock: 0,
+      imageUrl: ''
     };
     this.editingId.set(null);
   }

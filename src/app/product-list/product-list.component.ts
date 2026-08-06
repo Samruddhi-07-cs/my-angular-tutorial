@@ -2,18 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { Product } from '../product';
 import { CartService } from '../services/cart.service';
 import { SellerService } from '../services/seller.service';
-
-interface ProductItem {
-  id: number;
-  name: string;
-  price: number;
-  category: string;
-  color: string;
-  image: string;
-  description: string;
-}
 
 @Component({
   selector: 'app-product-list',
@@ -23,8 +14,8 @@ interface ProductItem {
   styleUrls: ['./product-list.component.css']
 })
 export class ProductListComponent implements OnInit {
-  productData = signal<ProductItem[]>([]);
-  filteredProducts = signal<ProductItem[]>([]);
+  productData = signal<Product[]>([]);
+  filteredProducts = signal<Product[]>([]);
   isLoading = signal(false);
   searchTerm = signal('');
 
@@ -43,7 +34,7 @@ export class ProductListComponent implements OnInit {
     this.isLoading.set(true);
     this.seller.productList().subscribe({
       next: (result) => {
-        const products = (result as ProductItem[]) ?? [];
+        const products = result ?? [];
         this.productData.set(products);
         this.applyFilter();
         this.isLoading.set(false);
@@ -69,13 +60,15 @@ export class ProductListComponent implements OnInit {
     this.filteredProducts.set(matches);
   }
 
-  addToCart(product: ProductItem): void {
+  addToCart(product: Product): void {
     this.cartService.addToCart({
-      id: product.id,
+      id: product.id ?? 0,
       name: product.name,
+      description: product.description,
+      category: product.category,
       price: product.price,
-      image: product.image,
-      category: product.category
+      stock: product.stock,
+      imageUrl: product.imageUrl
     });
   }
 }

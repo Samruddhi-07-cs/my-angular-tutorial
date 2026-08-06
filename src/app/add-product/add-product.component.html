@@ -14,13 +14,59 @@
   <div class="dashboard-grid">
     <form class="panel form-panel" #addProduct="ngForm" (ngSubmit)="submit(addProduct)">
       <h2>{{ editingId() ? 'Update Product' : 'Add Product' }}</h2>
-      <input type="text" name="name" [(ngModel)]="draft.name" placeholder="Product Name" required />
-      <input type="number" name="price" [(ngModel)]="draft.price" placeholder="Price" required />
-      <input type="text" name="category" [(ngModel)]="draft.category" placeholder="Category" required />
-      <input type="text" name="color" [(ngModel)]="draft.color" placeholder="Color" required />
-      <input type="text" name="image" [(ngModel)]="draft.image" placeholder="Image URL" required />
-      <textarea name="description" [(ngModel)]="draft.description" placeholder="Description" required></textarea>
-      <button type="submit" class="primary-btn" [disabled]="isSubmitting()">
+
+      <input
+        type="text"
+        name="name"
+        [(ngModel)]="draft.name"
+        placeholder="Product Name"
+        required
+      />
+
+      <input
+        type="number"
+        name="price"
+        [(ngModel)]="draft.price"
+        placeholder="Price"
+        required
+      />
+
+      <input
+        type="text"
+        name="category"
+        [(ngModel)]="draft.category"
+        placeholder="Category"
+        required
+      />
+
+      <input
+        type="number"
+        name="stock"
+        [(ngModel)]="draft.stock"
+        placeholder="Stock"
+        required
+      />
+
+      <input
+        type="text"
+        name="imageUrl"
+        [(ngModel)]="draft.imageUrl"
+        placeholder="Image URL"
+        required
+      />
+
+      <textarea
+        name="description"
+        [(ngModel)]="draft.description"
+        placeholder="Description"
+        required
+      ></textarea>
+
+      <button
+        type="submit"
+        class="primary-btn"
+        [disabled]="isSubmitting()"
+      >
         {{ isSubmitting() ? 'Saving...' : editingId() ? 'Update Product' : 'Add Product' }}
       </button>
     </form>
@@ -31,7 +77,9 @@
         <span>{{ products().length }} items</span>
       </div>
 
-      <div *ngIf="isLoading(); else productListTpl" class="loading-state">Loading products...</div>
+      <div *ngIf="isLoading(); else productListTpl" class="loading-state">
+        Loading products...
+      </div>
 
       <ng-template #productListTpl>
         <div class="product-table" *ngIf="products().length; else emptyTpl">
@@ -40,19 +88,36 @@
             <span>Price</span>
             <span>Actions</span>
           </div>
+
           <div class="table-row" *ngFor="let product of products()">
             <span>{{ product.name }}</span>
-            <span>${{ product.price }}</span>
+            <span>₹{{ product.price }}</span>
+
             <div class="action-group">
-              <button type="button" class="small-btn" (click)="editProduct(product)">Edit</button>
-              <button type="button" class="small-btn danger" (click)="deleteProduct(product.id!)">Delete</button>
+              <button
+                type="button"
+                class="small-btn"
+                (click)="editProduct(product)"
+              >
+                Edit
+              </button>
+
+              <button
+                type="button"
+                class="small-btn danger"
+                (click)="deleteProduct(product.id!)"
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>
       </ng-template>
 
       <ng-template #emptyTpl>
-        <div class="empty-state">No products yet. Add your first item to get started.</div>
+        <div class="empty-state">
+          No products yet. Add your first item to get started.
+        </div>
       </ng-template>
     </div>
   </div>

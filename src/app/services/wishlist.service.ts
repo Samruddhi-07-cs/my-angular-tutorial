@@ -22,8 +22,9 @@ export class WishlistService {
   }
 
   toggleWishlist(product: ProductLike): boolean {
-    if (this.isInWishlist(product.id)) {
-      this.removeFromWishlist(product.id);
+    const productId = product.id ?? 0;
+    if (this.isInWishlist(productId)) {
+      this.removeFromWishlist(productId);
       return false;
     }
 

@@ -1,21 +1,11 @@
 import { Injectable, signal } from '@angular/core';
+import { Product } from '../product';
 
-export interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  category?: string;
+export interface CartItem extends Product {
   quantity: number;
 }
 
-export interface ProductLike {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  category?: string;
-}
+export interface ProductLike extends Product {}
 
 @Injectable({
   providedIn: 'root'

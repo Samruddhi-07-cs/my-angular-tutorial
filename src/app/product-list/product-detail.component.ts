@@ -1,28 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { Product } from '../product';
 import { CartService } from '../services/cart.service';
 import { SellerService } from '../services/seller.service';
-
-interface ProductDetail {
-  id: number;
-  name: string;
-  price: number;
-  category: string;
-  color: string;
-  image: string;
-  description: string;
-}
-
-interface ProductPayload {
-  id?: number;
-  name: string;
-  price: number;
-  category: string;
-  color: string;
-  image: string;
-  description: string;
-}
 
 @Component({
   selector: 'app-product-detail',
@@ -32,7 +13,7 @@ interface ProductPayload {
   styleUrls: ['./product-detail.component.css']
 })
 export class ProductDetailComponent implements OnInit {
-  readonly product = signal<ProductDetail | null>(null);
+  readonly product = signal<Product | null>(null);
   readonly isLoading = signal(false);
 
   constructor(private route: ActivatedRoute, private seller: SellerService, private cartService: CartService) {}
@@ -43,16 +24,10 @@ export class ProductDetailComponent implements OnInit {
 
     this.seller.productList().subscribe({
       next: (result) => {
-        const items = (result ?? []) as ProductPayload[];
+        const items = (result ?? []) as Product[];
         const selected = items.find((item) => item.id === id);
         this.product.set(selected && selected.id !== undefined ? {
-          id: selected.id,
-          name: selected.name,
-          price: selected.price,
-          category: selected.category,
-          color: selected.color,
-          image: selected.image,
-          description: selected.description
+          ...selected
         } : null);
         this.isLoading.set(false);
       },
@@ -70,11 +45,13 @@ export class ProductDetailComponent implements OnInit {
     }
 
     this.cartService.addToCart({
-      id: current.id,
+      id: current.id ?? 0,
       name: current.name,
+      description: current.description,
+      category: current.category,
       price: current.price,
-      image: current.image,
-      category: current.category
+      stock: current.stock,
+      imageUrl: current.imageUrl
     });
   }
 }

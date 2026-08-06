@@ -46,12 +46,12 @@
   <div class="product-grid">
     <article class="product-card" *ngFor="let product of featuredProducts">
       <span class="product-tag">{{ product.tag }}</span>
-      <img [src]="product.image" [alt]="product.title" title="{{ product.title }}" />
+      <img [src]="product.imageUrl" [alt]="product.name" title="{{ product.name }}" />
       <div class="product-body">
-        <h3>{{ product.title }}</h3>
+        <h3>{{ product.name }}</h3>
         <div class="product-meta">
           <span>⭐ 4.8</span>
-          <strong>{{ product.price }}</strong>
+          <strong>${{ product.price }}</strong>
         </div>
         <div class="product-footer-actions">
           <button type="button" class="card-btn" (click)="addToCart(product)">Add to Cart</button>
@@ -70,12 +70,12 @@
   <div class="product-grid">
     <article class="product-card" *ngFor="let product of bestSellers">
       <span class="product-tag">{{ product.tag }}</span>
-      <img [src]="product.image" [alt]="product.title" title="{{ product.title }}" />
+      <img [src]="product.imageUrl" [alt]="product.name" title="{{ product.name }}" />
       <div class="product-body">
-        <h3>{{ product.title }}</h3>
+        <h3>{{ product.name }}</h3>
         <div class="product-meta">
           <span>⭐ 4.9</span>
-          <strong>{{ product.price }}</strong>
+          <strong>${{ product.price }}</strong>
         </div>
         <div class="product-footer-actions">
           <button type="button" class="card-btn" (click)="addToCart(product)">Add to Cart</button>

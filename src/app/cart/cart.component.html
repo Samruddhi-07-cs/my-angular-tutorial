@@ -11,19 +11,19 @@
     <div class="panel">
       <div class="alert" *ngIf="message()">{{ message() }}</div>
       <div class="cart-item" *ngFor="let item of items()">
-        <img [src]="item.image" [alt]="item.name" title="{{ item.name }}" />
+        <img [src]="item.imageUrl" [alt]="item.name" title="{{ item.name }}" />
         <div class="item-details">
           <h3>{{ item.name }}</h3>
           <p>${{ item.price }} each</p>
           <div class="qty-controls">
-            <button type="button" (click)="decreaseQuantity(item.id)">-</button>
+            <button type="button" (click)="decreaseQuantity(item.id!)">-</button>
             <span>{{ item.quantity }}</span>
-            <button type="button" (click)="increaseQuantity(item.id)">+</button>
+            <button type="button" (click)="increaseQuantity(item.id!)">+</button>
           </div>
         </div>
         <div class="item-actions">
           <strong>${{ item.price * item.quantity }}</strong>
-          <button type="button" class="remove-btn" (click)="removeItem(item.id)">Remove</button>
+          <button type="button" class="remove-btn" (click)="removeItem(item.id!)">Remove</button>
         </div>
       </div>
     </div>

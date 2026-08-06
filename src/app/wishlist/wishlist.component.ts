@@ -16,7 +16,7 @@ export class WishlistComponent {
 
   constructor(private wishlistService: WishlistService, private cartService: CartService) {}
 
-  addToCart(id: number): void {
+  addToCart(id: number | undefined): void {
     const selected = this.items().find((item) => item.id === id);
     if (!selected) {
       return;
@@ -25,7 +25,7 @@ export class WishlistComponent {
     this.cartService.addToCart(selected);
   }
 
-  removeFromWishlist(id: number): void {
-    this.wishlistService.removeFromWishlist(id);
+  removeFromWishlist(id: number | undefined): void {
+    this.wishlistService.removeFromWishlist(id ?? 0);
   }
 }
