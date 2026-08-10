@@ -6,17 +6,12 @@ import com.cscorner.demo.dto.RegisterRequest;
 import com.cscorner.demo.entity.User;
 import com.cscorner.demo.security.JwtUtil;
 import com.cscorner.demo.service.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(
-        origins = {
-                "http://localhost:4200",
-                "https://my-angular-tutorial-production-4383.up.railway.app"
-        }
-)
 public class AuthController {
 
     @Autowired
@@ -26,7 +21,8 @@ public class AuthController {
     private JwtUtil jwtUtil;
 
     @PostMapping("/register")
-    public AuthResponse register(@RequestBody RegisterRequest request) {
+    public AuthResponse register(
+            @RequestBody RegisterRequest request) {
 
         User user = new User();
 
@@ -37,7 +33,8 @@ public class AuthController {
 
         userService.register(user);
 
-        String token = jwtUtil.generateToken(user.getEmail());
+        String token =
+                jwtUtil.generateToken(user.getEmail());
 
         return new AuthResponse(
                 "Registration Successful",
@@ -46,14 +43,16 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public AuthResponse login(@RequestBody LoginRequest request) {
+    public AuthResponse login(
+            @RequestBody LoginRequest request) {
 
         User user = userService.login(
                 request.getEmail(),
                 request.getPassword()
         );
 
-        String token = jwtUtil.generateToken(user.getEmail());
+        String token =
+                jwtUtil.generateToken(user.getEmail());
 
         return new AuthResponse(
                 "Login Successful",

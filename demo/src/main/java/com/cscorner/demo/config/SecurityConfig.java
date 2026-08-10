@@ -4,15 +4,18 @@ import com.cscorner.demo.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import org.springframework.http.HttpMethod;
 
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
@@ -28,10 +31,14 @@ public class SecurityConfig {
             throws Exception {
 
         http
+
+                // Disable CSRF because we are using JWT
                 .csrf(csrf -> csrf.disable())
 
+                // Enable CORS
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
+                // No HTTP session
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS
@@ -40,19 +47,28 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
-                        // Public authentication APIs
-                        .requestMatchers("/api/auth/**").permitAll()
+                        // Allow browser preflight requests
+                        .requestMatchers(HttpMethod.OPTIONS, "/**")
+                        .permitAll()
 
-                        // Public product GET APIs
+                        // Authentication APIs are PUBLIC
+                        .requestMatchers("/api/auth/**")
+                        .permitAll()
+
+                        // Product GET APIs are PUBLIC
                         .requestMatchers(
-                                org.springframework.http.HttpMethod.GET,
+                                HttpMethod.GET,
+                                "/api/products",
                                 "/api/products/**"
-                        ).permitAll()
+                        )
+                        .permitAll()
 
-                        // Everything else requires authentication
-                        .anyRequest().authenticated()
+                        // Everything else needs JWT
+                        .anyRequest()
+                        .authenticated()
                 )
 
+                // JWT filter
                 .addFilterBefore(
                         jwtFilter,
                         UsernamePasswordAuthenticationFilter.class
@@ -61,15 +77,21 @@ public class SecurityConfig {
         return http.build();
     }
 
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
         CorsConfiguration configuration =
                 new CorsConfiguration();
 
+        // Allow Angular localhost
         configuration.setAllowedOrigins(List.of(
-                "http://localhost:4200",
-                "https://my-angular-tutorial-production-4383.up.railway.app"
+                "http://localhost:4200"
+        ));
+
+        // Allow Railway Angular frontend
+        configuration.setAllowedOriginPatterns(List.of(
+                "https://*.up.railway.app"
         ));
 
         configuration.setAllowedMethods(List.of(
@@ -80,7 +102,13 @@ public class SecurityConfig {
                 "OPTIONS"
         ));
 
-        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowedHeaders(List.of(
+                "*"
+        ));
+
+        configuration.setExposedHeaders(List.of(
+                "Authorization"
+        ));
 
         configuration.setAllowCredentials(true);
 
