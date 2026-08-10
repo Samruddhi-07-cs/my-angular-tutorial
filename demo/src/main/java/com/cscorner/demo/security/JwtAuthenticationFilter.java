@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -20,8 +19,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Component
-public class JwtAuthenticationFilter
-        extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -29,20 +27,22 @@ public class JwtAuthenticationFilter
     @Autowired
     private UserRepository userRepository;
 
-
     @Override
-    protected boolean shouldNotFilter(
-            HttpServletRequest request) {
+    protected boolean shouldNotFilter(HttpServletRequest request) {
 
         String path = request.getServletPath();
+
+        // Do NOT run JWT authentication for:
+        // registration
+        // login
+        // public products
+        // CORS preflight
 
         return path.startsWith("/api/auth/")
                 || path.startsWith("/api/products/")
                 || path.equals("/api/products")
-                || request.getMethod()
-                        .equalsIgnoreCase("OPTIONS");
+                || request.getMethod().equalsIgnoreCase("OPTIONS");
     }
-
 
     @Override
     protected void doFilterInternal(
@@ -77,28 +77,24 @@ public class JwtAuthenticationFilter
                                     user,
                                     null,
                                     List.of(
-                                            new SimpleGrantedAuthority(
-                                                    "ROLE_" +
-                                                    user.getRole()
-                                            )
+                                        new SimpleGrantedAuthority(
+                                            "ROLE_" + user.getRole()
+                                        )
                                     )
                             );
 
                     SecurityContextHolder
                             .getContext()
-                            .setAuthentication(
-                                    authentication
-                            );
+                            .setAuthentication(authentication);
                 }
 
             } catch (Exception e) {
-                // Invalid JWT
+                // Invalid or expired JWT.
+                SecurityContextHolder
+                        .clearContext();
             }
         }
 
-        filterChain.doFilter(
-                request,
-                response
-        );
+        filterChain.doFilter(request, response);
     }
 }

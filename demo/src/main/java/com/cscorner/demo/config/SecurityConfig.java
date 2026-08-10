@@ -2,16 +2,11 @@ package com.cscorner.demo.config;
 
 import com.cscorner.demo.security.JwtAuthenticationFilter;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import org.springframework.http.HttpMethod;
-
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -19,102 +14,104 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.List;
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private JwtAuthenticationFilter jwtFilter;
+    private final JwtAuthenticationFilter jwtFilter;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtFilter) {
+        this.jwtFilter = jwtFilter;
+    }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(
-            HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http)
+            throws Exception {
 
         http
-                // Disable CSRF for REST API
-                .csrf(csrf -> csrf.disable())
+            // Disable CSRF because this is a JWT REST API
+            .csrf(csrf -> csrf.disable())
 
-                // Enable CORS
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            // Enable CORS
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                // JWT based authentication - no sessions
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(
-                                SessionCreationPolicy.STATELESS
-                        )
+            // No HTTP session
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(
+                    SessionCreationPolicy.STATELESS
                 )
+            )
 
-                // Authorization rules
-                .authorizeHttpRequests(auth -> auth
+            // API authorization
+            .authorizeHttpRequests(auth -> auth
 
-                        // CORS preflight
-                        .requestMatchers(HttpMethod.OPTIONS, "/**")
-                        .permitAll()
+                // CORS preflight
+                .requestMatchers(
+                    org.springframework.http.HttpMethod.OPTIONS,
+                    "/**"
+                ).permitAll()
 
-                        // Authentication APIs - PUBLIC
-                        .requestMatchers("/api/auth/**")
-                        .permitAll()
+                // Login and registration are public
+                .requestMatchers("/api/auth/**").permitAll()
 
-                        // Product APIs - PUBLIC
-                        .requestMatchers("/api/products/**")
-                        .permitAll()
+                // Product GET requests are public
+                .requestMatchers(
+                    org.springframework.http.HttpMethod.GET,
+                    "/api/products/**"
+                ).permitAll()
 
-                        // Everything else requires login
-                        .anyRequest()
-                        .authenticated()
-                )
+                // Everything else requires JWT
+                .anyRequest().authenticated()
+            )
 
-                // JWT filter
-                .addFilterBefore(
-                        jwtFilter,
-                        UsernamePasswordAuthenticationFilter.class
-                );
+            // JWT filter
+            .addFilterBefore(
+                jwtFilter,
+                UsernamePasswordAuthenticationFilter.class
+            );
 
         return http.build();
     }
-
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
         CorsConfiguration configuration =
-                new CorsConfiguration();
+            new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of(
-                "http://localhost:4200",
-                "http://localhost:53712",
-                "https://my-angular-tutorial-production-4383.up.railway.app"
+        configuration.setAllowedOrigins(Arrays.asList(
+            "https://my-angular-tutorial-production-4383.up.railway.app",
+            "https://my-angular-tutorial-production-f731.up.railway.app",
+            "http://localhost:4200",
+            "http://localhost:4201"
         ));
 
-        configuration.setAllowedMethods(List.of(
-                "GET",
-                "POST",
-                "PUT",
-                "DELETE",
-                "OPTIONS"
+        configuration.setAllowedMethods(Arrays.asList(
+            "GET",
+            "POST",
+            "PUT",
+            "DELETE",
+            "OPTIONS"
         ));
 
-        configuration.setAllowedHeaders(List.of(
-                "Authorization",
-                "Content-Type",
-                "Accept",
-                "Origin"
-        ));
-
-        configuration.setExposedHeaders(List.of(
-                "Authorization"
+        configuration.setAllowedHeaders(Arrays.asList(
+            "Authorization",
+            "Content-Type",
+            "Accept",
+            "Origin",
+            "X-Requested-With"
         ));
 
         configuration.setAllowCredentials(false);
 
         UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
+            new UrlBasedCorsConfigurationSource();
 
         source.registerCorsConfiguration(
-                "/**",
-                configuration
+            "/**",
+            configuration
         );
 
         return source;

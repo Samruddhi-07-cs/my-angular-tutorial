@@ -3,20 +3,16 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Product } from '../product';
 
+export interface SellerRecord {
+  id?: string;
+  name?: string;
+  email?: string;
+  password?: string;
+}
+
 export interface AuthResponse {
   message: string;
   token: string;
-}
-
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface RegisterRequest {
-  name: string;
-  email: string;
-  password: string;
 }
 
 @Injectable({
@@ -24,62 +20,89 @@ export interface RegisterRequest {
 })
 export class SellerService {
 
+  // Spring Boot Railway backend
   private readonly baseUrl =
     'https://my-angular-tutorial-production.up.railway.app/api';
 
   constructor(private http: HttpClient) {}
 
   // =========================
-  // REGISTER SELLER
+  // SELLER REGISTER
   // =========================
   registerSeller(
     name: string,
     email: string,
     password: string
-  ): Observable<any> {
+  ): Observable<AuthResponse> {
 
-    const data = {
-      name: name,
-      email: email,
-      password: password
-    };
-
-    return this.http.post(
+    return this.http.post<AuthResponse>(
       `${this.baseUrl}/auth/register`,
-      data
+      {
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        password: password
+      }
     );
   }
 
   // =========================
-  // LOGIN SELLER
+  // SELLER LOGIN
   // =========================
   authenticateSeller(
     email: string,
     password: string
-  ): Observable<any> {
+  ): Observable<AuthResponse> {
 
-    const data = {
-      email: email,
-      password: password
-    };
-
-    return this.http.post(
+    return this.http.post<AuthResponse>(
       `${this.baseUrl}/auth/login`,
-      data
+      {
+        email: email.trim().toLowerCase(),
+        password: password
+      }
     );
   }
 
   // =========================
-  // PRODUCTS
+  // USER SIGNUP
   // =========================
+  userSignup(
+    data: Record<string, unknown>
+  ): Observable<AuthResponse> {
 
-  addProduct(data: Product): Observable<Product> {
+    const name =
+      String(data['name'] ?? '').trim();
+
+    const email =
+      String(data['email'] ?? '')
+        .trim()
+        .toLowerCase();
+
+    const password =
+      String(data['password'] ?? '');
+
+    return this.registerSeller(
+      name,
+      email,
+      password
+    );
+  }
+
+  // =========================
+  // ADD PRODUCT
+  // =========================
+  addProduct(
+    data: Product
+  ): Observable<Product> {
+
     return this.http.post<Product>(
       `${this.baseUrl}/products`,
       data
     );
   }
 
+  // =========================
+  // UPDATE PRODUCT
+  // =========================
   updateProduct(
     id: number,
     data: Product
@@ -91,13 +114,21 @@ export class SellerService {
     );
   }
 
-  deleteProduct(id: number): Observable<void> {
+  // =========================
+  // DELETE PRODUCT
+  // =========================
+  deleteProduct(
+    id: number
+  ): Observable<void> {
 
     return this.http.delete<void>(
       `${this.baseUrl}/products/${id}`
     );
   }
 
+  // =========================
+  // GET PRODUCTS
+  // =========================
   productList(): Observable<Product[]> {
 
     return this.http.get<Product[]>(
