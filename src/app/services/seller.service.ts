@@ -14,7 +14,7 @@ interface SellerRecord {
   providedIn: 'root'
 })
 export class SellerService {
-  private readonly baseUrl = 'http://localhost:8081/api';
+  private readonly baseUrl = 'https://my-angular-tutorial-production.up.railway.app/api';
   private readonly productStorageKey = 'novacart-products';
   private readonly sellerStorageKey = 'novacart-sellers';
 
