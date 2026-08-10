@@ -1,3 +1,4 @@
+
 package com.cscorner.demo.security;
 
 import com.cscorner.demo.entity.User;
@@ -6,6 +7,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,6 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String path = request.getServletPath();
 
+        // Do not apply JWT authentication to public APIs
         return path.startsWith("/api/auth/")
                 || path.startsWith("/api/products/")
                 || path.equals("/api/products")
@@ -54,7 +57,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 String email = jwtUtil.extractUsername(token);
 
-                User user = userRepository.findByEmail(email).orElse(null);
+                User user =
+                        userRepository.findByEmail(email)
+                                .orElse(null);
 
                 if (user != null) {
 
@@ -75,7 +80,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
 
             } catch (Exception e) {
-                // Invalid JWT token
+
+                // Invalid or expired JWT token.
+                SecurityContextHolder
+                        .clearContext();
             }
         }
 

@@ -11,10 +11,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = {
-        "http://localhost:4200",
-        "https://my-angular-tutorial-production.up.railway.app"
-})
+@CrossOrigin(
+        origins = {
+                "http://localhost:4200",
+                "https://my-angular-tutorial-production-4383.up.railway.app"
+        }
+)
 public class AuthController {
 
     @Autowired
@@ -27,6 +29,7 @@ public class AuthController {
     public AuthResponse register(@RequestBody RegisterRequest request) {
 
         User user = new User();
+
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
