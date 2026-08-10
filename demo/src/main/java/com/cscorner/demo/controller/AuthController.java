@@ -8,6 +8,7 @@ import com.cscorner.demo.security.JwtUtil;
 import com.cscorner.demo.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,41 +28,111 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
+
+    // =========================
+    // REGISTER
+    // =========================
+
     @PostMapping("/register")
-    public AuthResponse register(
+    public ResponseEntity<?> register(
             @RequestBody RegisterRequest request) {
 
-        User user = new User();
+        try {
 
-        user.setName(request.getName());
-        user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
-        user.setRole("SELLER");
+            User user = new User();
 
-        userService.register(user);
+            user.setName(request.getName());
+            user.setEmail(request.getEmail());
+            user.setPassword(request.getPassword());
+            user.setRole("SELLER");
 
-        String token = jwtUtil.generateToken(user.getEmail());
+            User savedUser =
+                    userService.register(user);
 
-        return new AuthResponse(
-                "Registration Successful",
-                token
-        );
+            String token =
+                    jwtUtil.generateToken(
+                            savedUser.getEmail()
+                    );
+
+            return ResponseEntity.ok(
+                    new AuthResponse(
+                            "Registration Successful",
+                            token
+                    )
+            );
+
+        } catch (RuntimeException e) {
+
+            return ResponseEntity
+                    .badRequest()
+                    .body(
+                            new ErrorResponse(
+                                    e.getMessage()
+                            )
+                    );
+        }
     }
 
+
+    // =========================
+    // LOGIN
+    // =========================
+
     @PostMapping("/login")
-    public AuthResponse login(
+    public ResponseEntity<?> login(
             @RequestBody LoginRequest request) {
 
-        User user = userService.login(
-                request.getEmail(),
-                request.getPassword()
-        );
+        try {
 
-        String token = jwtUtil.generateToken(user.getEmail());
+            User user =
+                    userService.login(
+                            request.getEmail(),
+                            request.getPassword()
+                    );
 
-        return new AuthResponse(
-                "Login Successful",
-                token
-        );
+            String token =
+                    jwtUtil.generateToken(
+                            user.getEmail()
+                    );
+
+            return ResponseEntity.ok(
+                    new AuthResponse(
+                            "Login Successful",
+                            token
+                    )
+            );
+
+        } catch (RuntimeException e) {
+
+            return ResponseEntity
+                    .badRequest()
+                    .body(
+                            new ErrorResponse(
+                                    e.getMessage()
+                            )
+                    );
+        }
+    }
+
+
+    // =========================
+    // ERROR RESPONSE
+    // =========================
+
+    public static class ErrorResponse {
+
+        private String message;
+
+        public ErrorResponse(String message) {
+            this.message = message;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
     }
 }

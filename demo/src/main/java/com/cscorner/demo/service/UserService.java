@@ -16,9 +16,6 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // =========================
-    // REGISTER USER
-    // =========================
     public User register(User user) {
 
         if (repository.findByEmail(user.getEmail()).isPresent()) {
@@ -29,28 +26,33 @@ public class UserService {
                 passwordEncoder.encode(user.getPassword())
         );
 
-        if (user.getRole() == null || user.getRole().isEmpty()) {
+        if (user.getRole() == null ||
+                user.getRole().isEmpty()) {
+
             user.setRole("SELLER");
         }
 
         return repository.save(user);
     }
 
-    // =========================
-    // LOGIN USER
-    // =========================
-    public User login(String email, String password) {
+    public User login(
+            String email,
+            String password) {
 
         User user = repository.findByEmail(email)
                 .orElseThrow(
-                        () -> new RuntimeException("User not found")
+                        () -> new RuntimeException(
+                                "User not found"
+                        )
                 );
 
         if (!passwordEncoder.matches(
                 password,
-                user.getPassword()
-        )) {
-            throw new RuntimeException("Invalid Password");
+                user.getPassword())) {
+
+            throw new RuntimeException(
+                    "Invalid Password"
+            );
         }
 
         return user;
