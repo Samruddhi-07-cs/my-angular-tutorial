@@ -8,28 +8,32 @@ import { Product } from '../product';
 })
 export class ProductService {
 
-  private apiUrl = 'http://localhost:8081/api/products';
+  private apiUrl = 'https://my-angular-tutorial-production.up.railway.app/api/products';
 
   constructor(private http: HttpClient) { }
 
+  // Get all products
   getProducts(): Observable<Product[]> {
     return this.http.get<Product[]>(this.apiUrl);
   }
 
+  // Get product by ID
   getProduct(id: number): Observable<Product> {
     return this.http.get<Product>(`${this.apiUrl}/${id}`);
   }
 
+  // Add product
   addProduct(product: Product): Observable<Product> {
     return this.http.post<Product>(this.apiUrl, product);
   }
 
+  // Update product
   updateProduct(id: number, product: Product): Observable<Product> {
     return this.http.put<Product>(`${this.apiUrl}/${id}`, product);
   }
 
-  deleteProduct(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+  // Delete product
+  deleteProduct(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
-
 }
