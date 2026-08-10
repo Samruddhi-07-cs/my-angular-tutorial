@@ -2,7 +2,6 @@ package com.cscorner.demo.security;
 
 import com.cscorner.demo.entity.User;
 import com.cscorner.demo.repository.UserRepository;
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,17 +30,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
 
         String path = request.getServletPath();
+        String method = request.getMethod();
 
-        // Do NOT run JWT authentication for:
-        // registration
-        // login
-        // public products
-        // CORS preflight
+        // Public authentication APIs
+        if (path.startsWith("/api/auth/")) {
+            return true;
+        }
 
-        return path.startsWith("/api/auth/")
-                || path.startsWith("/api/products/")
-                || path.equals("/api/products")
-                || request.getMethod().equalsIgnoreCase("OPTIONS");
+        // Public GET product APIs
+        if (path.equals("/api/products")
+                && method.equalsIgnoreCase("GET")) {
+            return true;
+        }
+
+        if (path.startsWith("/api/products/")
+                && method.equalsIgnoreCase("GET")) {
+            return true;
+        }
+
+        // CORS preflight request
+        if (method.equalsIgnoreCase("OPTIONS")) {
+            return true;
+        }
+
+        // POST, PUT and DELETE must pass through JWT authentication
+        return false;
     }
 
     @Override
@@ -51,24 +64,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain)
             throws ServletException, IOException {
 
-        String authHeader =
-                request.getHeader("Authorization");
+        String authHeader = request.getHeader("Authorization");
 
-        if (authHeader != null &&
-                authHeader.startsWith("Bearer ")) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
 
-            String token =
-                    authHeader.substring(7);
+            String token = authHeader.substring(7);
 
             try {
 
-                String email =
-                        jwtUtil.extractUsername(token);
+                String email = jwtUtil.extractUsername(token);
 
-                User user =
-                        userRepository
-                                .findByEmail(email)
-                                .orElse(null);
+                User user = userRepository
+                        .findByEmail(email)
+                        .orElse(null);
 
                 if (user != null) {
 
@@ -77,9 +85,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     user,
                                     null,
                                     List.of(
-                                        new SimpleGrantedAuthority(
-                                            "ROLE_" + user.getRole()
-                                        )
+                                            new SimpleGrantedAuthority(
+                                                    "ROLE_" + user.getRole()
+                                            )
                                     )
                             );
 
@@ -89,9 +97,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
 
             } catch (Exception e) {
-                // Invalid or expired JWT.
-                SecurityContextHolder
-                        .clearContext();
+                // Invalid or expired JWT token.
+                // Spring Security will handle the unauthenticated request.
             }
         }
 

@@ -3,16 +3,16 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Product } from '../product';
 
-export interface SellerRecord {
-  id?: string;
-  name?: string;
-  email?: string;
-  password?: string;
-}
-
 export interface AuthResponse {
   message: string;
   token: string;
+}
+
+export interface SellerRecord {
+  id: string;
+  name: string;
+  email: string;
+  password?: string;
 }
 
 @Injectable({
@@ -20,14 +20,15 @@ export interface AuthResponse {
 })
 export class SellerService {
 
-  // Spring Boot Railway backend
   private readonly baseUrl =
     'https://my-angular-tutorial-production.up.railway.app/api';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient
+  ) {}
 
   // =========================
-  // SELLER REGISTER
+  // REGISTER SELLER
   // =========================
   registerSeller(
     name: string,
@@ -46,7 +47,7 @@ export class SellerService {
   }
 
   // =========================
-  // SELLER LOGIN
+  // LOGIN SELLER
   // =========================
   authenticateSeller(
     email: string,
@@ -63,31 +64,6 @@ export class SellerService {
   }
 
   // =========================
-  // USER SIGNUP
-  // =========================
-  userSignup(
-    data: Record<string, unknown>
-  ): Observable<AuthResponse> {
-
-    const name =
-      String(data['name'] ?? '').trim();
-
-    const email =
-      String(data['email'] ?? '')
-        .trim()
-        .toLowerCase();
-
-    const password =
-      String(data['password'] ?? '');
-
-    return this.registerSeller(
-      name,
-      email,
-      password
-    );
-  }
-
-  // =========================
   // ADD PRODUCT
   // =========================
   addProduct(
@@ -96,7 +72,10 @@ export class SellerService {
 
     return this.http.post<Product>(
       `${this.baseUrl}/products`,
-      data
+      data,
+      {
+        headers: this.getAuthHeaders()
+      }
     );
   }
 
@@ -110,7 +89,10 @@ export class SellerService {
 
     return this.http.put<Product>(
       `${this.baseUrl}/products/${id}`,
-      data
+      data,
+      {
+        headers: this.getAuthHeaders()
+      }
     );
   }
 
@@ -122,7 +104,10 @@ export class SellerService {
   ): Observable<void> {
 
     return this.http.delete<void>(
-      `${this.baseUrl}/products/${id}`
+      `${this.baseUrl}/products/${id}`,
+      {
+        headers: this.getAuthHeaders()
+      }
     );
   }
 
@@ -134,5 +119,19 @@ export class SellerService {
     return this.http.get<Product[]>(
       `${this.baseUrl}/products`
     );
+  }
+
+  // =========================
+  // JWT HEADER
+  // =========================
+  private getAuthHeaders() {
+
+    const token =
+      localStorage.getItem('novacart-token');
+
+    return {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    };
   }
 }

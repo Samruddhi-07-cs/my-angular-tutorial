@@ -47,12 +47,12 @@ export class AuthService {
             const user: SellerUser = {
               id: email,
               name: email.split('@')[0],
-              email: email
+              email: email.toLowerCase()
             };
 
             this.setCurrentUser(user);
 
-            // Save JWT token
+            // IMPORTANT: save JWT using ONE fixed key
             localStorage.setItem(
               'novacart-token',
               response.token
@@ -60,8 +60,7 @@ export class AuthService {
 
             return {
               success: true,
-              message: response.message ||
-                'Login successful.'
+              message: response.message || 'Login successful.'
             };
           }
 
@@ -69,8 +68,7 @@ export class AuthService {
 
           return {
             success: false,
-            message: response?.message ||
-              'Login failed.'
+            message: response?.message || 'Login failed.'
           };
         }),
 
@@ -115,12 +113,12 @@ export class AuthService {
             const user: SellerUser = {
               id: email,
               name: name,
-              email: email
+              email: email.toLowerCase()
             };
 
             this.setCurrentUser(user);
 
-            // Save JWT token
+            // IMPORTANT: save JWT
             localStorage.setItem(
               'novacart-token',
               response.token
@@ -128,7 +126,8 @@ export class AuthService {
 
             return {
               success: true,
-              message: response.message ||
+              message:
+                response.message ||
                 'Registration successful.'
             };
           }
@@ -137,7 +136,8 @@ export class AuthService {
 
           return {
             success: false,
-            message: response?.message ||
+            message:
+              response?.message ||
               'Registration failed.'
           };
         }),
@@ -176,7 +176,7 @@ export class AuthService {
   }
 
   // =========================
-  // SET USER
+  // SET CURRENT USER
   // =========================
   private setCurrentUser(
     user: SellerUser
