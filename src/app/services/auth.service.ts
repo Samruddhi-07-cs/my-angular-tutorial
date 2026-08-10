@@ -1,11 +1,11 @@
 import { Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { SellerService } from './seller.service';
+import { Observable, map, catchError, of } from 'rxjs';
+import { SellerService, AuthResponse } from './seller.service';
 
 export interface SellerUser {
-  id?: string;
-  name?: string;
+  id: string;
+  name: string;
   email: string;
 }
 
@@ -25,148 +25,159 @@ export class AuthService {
     private router: Router
   ) {}
 
+  // =========================
+  // LOGIN
+  // =========================
   login(
     email: string,
     password: string
-  ): Observable<{ success: boolean; message: string }> {
+  ): Observable<{
+    success: boolean;
+    message: string;
+  }> {
 
-    return new Observable(observer => {
+    return this.sellerService
+      .authenticateSeller(email, password)
+      .pipe(
 
-      this.sellerService
-        .authenticateSeller(email, password)
-        .subscribe({
+        map((response: AuthResponse) => {
 
-          next: (response) => {
+          if (response && response.token) {
 
-            if (response && response.token) {
+            const user: SellerUser = {
+              id: email,
+              name: email.split('@')[0],
+              email: email
+            };
 
-              const user: SellerUser = {
-                email: email
-              };
+            this.setCurrentUser(user);
 
-              localStorage.setItem(
-                'novacart-token',
-                response.token
-              );
+            // Save JWT token
+            localStorage.setItem(
+              'novacart-token',
+              response.token
+            );
 
-              this.setCurrentUser(user);
-
-              observer.next({
-                success: true,
-                message: response.message ||
-                         'Login successful.'
-              });
-
-            } else {
-
-              this.clearSession();
-
-              observer.next({
-                success: false,
-                message: 'Login failed.'
-              });
-            }
-
-            observer.complete();
-          },
-
-          error: (error) => {
-
-            console.error('Login error:', error);
-
-            this.clearSession();
-
-            observer.next({
-              success: false,
-              message:
-                'Unable to login. Please check your email and password.'
-            });
-
-            observer.complete();
+            return {
+              success: true,
+              message: response.message ||
+                'Login successful.'
+            };
           }
 
-        });
-    });
+          this.clearSession();
+
+          return {
+            success: false,
+            message: response?.message ||
+              'Login failed.'
+          };
+        }),
+
+        catchError((error) => {
+
+          console.error('Login error:', error);
+
+          this.clearSession();
+
+          return of({
+            success: false,
+            message:
+              error?.error?.message ||
+              'Unable to login. Please check your email and password.'
+          });
+        })
+      );
   }
 
-
+  // =========================
+  // REGISTER
+  // =========================
   register(
     name: string,
     email: string,
     password: string
-  ): Observable<{ success: boolean; message: string }> {
+  ): Observable<{
+    success: boolean;
+    message: string;
+  }> {
 
-    return new Observable(observer => {
+    return this.sellerService
+      .registerSeller(name, email, password)
+      .pipe(
 
-      this.sellerService
-        .registerSeller(name, email, password)
-        .subscribe({
+        map((response: AuthResponse) => {
 
-          next: (response) => {
+          console.log('Registration response:', response);
 
-            if (response && response.token) {
+          if (response && response.token) {
 
-              const user: SellerUser = {
-                name: name,
-                email: email
-              };
+            const user: SellerUser = {
+              id: email,
+              name: name,
+              email: email
+            };
 
-              localStorage.setItem(
-                'novacart-token',
-                response.token
-              );
+            this.setCurrentUser(user);
 
-              this.setCurrentUser(user);
-
-              observer.next({
-                success: true,
-                message:
-                  response.message ||
-                  'Registration successful.'
-              });
-
-            } else {
-
-              observer.next({
-                success: false,
-                message: 'Registration failed.'
-              });
-            }
-
-            observer.complete();
-          },
-
-          error: (error) => {
-
-            console.error(
-              'Registration error:',
-              error
+            // Save JWT token
+            localStorage.setItem(
+              'novacart-token',
+              response.token
             );
 
-            observer.next({
-              success: false,
-              message:
-                'Registration failed.'
-            });
-
-            observer.complete();
+            return {
+              success: true,
+              message: response.message ||
+                'Registration successful.'
+            };
           }
 
-        });
-    });
+          this.clearSession();
+
+          return {
+            success: false,
+            message: response?.message ||
+              'Registration failed.'
+          };
+        }),
+
+        catchError((error) => {
+
+          console.error(
+            'Registration error:',
+            error
+          );
+
+          this.clearSession();
+
+          return of({
+            success: false,
+            message:
+              error?.error?.message ||
+              'Registration failed.'
+          });
+        })
+      );
   }
 
-
+  // =========================
+  // LOGOUT
+  // =========================
   logout(): void {
 
-    localStorage.removeItem('novacart-token');
-
     this.clearSession();
+
+    localStorage.removeItem(
+      'novacart-token'
+    );
 
     this.router.navigate(['/']);
   }
 
-
+  // =========================
+  // SET USER
+  // =========================
   private setCurrentUser(
     user: SellerUser
   ): void {
@@ -180,7 +191,9 @@ export class AuthService {
     );
   }
 
-
+  // =========================
+  // CLEAR SESSION
+  // =========================
   private clearSession(): void {
 
     this.currentUser.set(null);
@@ -189,13 +202,11 @@ export class AuthService {
     localStorage.removeItem(
       'novacart-auth-user'
     );
-
-    localStorage.removeItem(
-      'novacart-token'
-    );
   }
 
-
+  // =========================
+  // READ USER
+  // =========================
   private readFromStorage(): SellerUser | null {
 
     if (typeof window === 'undefined') {
