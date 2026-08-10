@@ -12,6 +12,13 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(
+        origins = {
+                "http://localhost:4200",
+                "http://localhost:53712",
+                "https://my-angular-tutorial-production-4383.up.railway.app"
+        }
+)
 public class AuthController {
 
     @Autowired
@@ -33,8 +40,7 @@ public class AuthController {
 
         userService.register(user);
 
-        String token =
-                jwtUtil.generateToken(user.getEmail());
+        String token = jwtUtil.generateToken(user.getEmail());
 
         return new AuthResponse(
                 "Registration Successful",
@@ -51,8 +57,7 @@ public class AuthController {
                 request.getPassword()
         );
 
-        String token =
-                jwtUtil.generateToken(user.getEmail());
+        String token = jwtUtil.generateToken(user.getEmail());
 
         return new AuthResponse(
                 "Login Successful",

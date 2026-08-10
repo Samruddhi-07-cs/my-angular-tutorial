@@ -30,48 +30,49 @@ export class SellerService {
   constructor(private http: HttpClient) {}
 
   // =========================
-  // SELLER REGISTER
+  // REGISTER SELLER
   // =========================
   registerSeller(
     name: string,
     email: string,
     password: string
-  ): Observable<AuthResponse> {
+  ): Observable<any> {
 
-    const data: RegisterRequest = {
-      name,
-      email,
-      password
+    const data = {
+      name: name,
+      email: email,
+      password: password
     };
 
-    return this.http.post<AuthResponse>(
+    return this.http.post(
       `${this.baseUrl}/auth/register`,
       data
     );
   }
 
   // =========================
-  // SELLER LOGIN
+  // LOGIN SELLER
   // =========================
   authenticateSeller(
     email: string,
     password: string
-  ): Observable<AuthResponse> {
+  ): Observable<any> {
 
-    const data: LoginRequest = {
-      email,
-      password
+    const data = {
+      email: email,
+      password: password
     };
 
-    return this.http.post<AuthResponse>(
+    return this.http.post(
       `${this.baseUrl}/auth/login`,
       data
     );
   }
 
   // =========================
-  // ADD PRODUCT
+  // PRODUCTS
   // =========================
+
   addProduct(data: Product): Observable<Product> {
     return this.http.post<Product>(
       `${this.baseUrl}/products`,
@@ -79,9 +80,6 @@ export class SellerService {
     );
   }
 
-  // =========================
-  // UPDATE PRODUCT
-  // =========================
   updateProduct(
     id: number,
     data: Product
@@ -93,9 +91,6 @@ export class SellerService {
     );
   }
 
-  // =========================
-  // DELETE PRODUCT
-  // =========================
   deleteProduct(id: number): Observable<void> {
 
     return this.http.delete<void>(
@@ -103,9 +98,6 @@ export class SellerService {
     );
   }
 
-  // =========================
-  // GET PRODUCTS
-  // =========================
   productList(): Observable<Product[]> {
 
     return this.http.get<Product[]>(
