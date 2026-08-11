@@ -1,18 +1,17 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
 import { Product } from '../product';
 
 export interface AuthResponse {
-  message: string;
   token: string;
+  message: string;
 }
 
-export interface SellerRecord {
+interface SellerRecord {
   id: string;
   name: string;
   email: string;
-  password?: string;
 }
 
 @Injectable({
@@ -21,15 +20,28 @@ export interface SellerRecord {
 export class SellerService {
 
   private readonly baseUrl =
-    'https://my-angular-tutorial-production.up.railway.app/api';
+    'https://my-angular-tutorial-production-4383.up.railway.app/api';
 
-  constructor(
-    private http: HttpClient
-  ) {}
+  constructor(private http: HttpClient) {}
 
-  // =========================
-  // REGISTER SELLER
-  // =========================
+  // =====================================================
+  // GET JWT TOKEN
+  // =====================================================
+  private getAuthHeaders(): HttpHeaders {
+
+    const token = localStorage.getItem('novacart-token');
+
+    console.log('JWT token being sent:', token);
+
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+  }
+
+  // =====================================================
+  // REGISTER
+  // =====================================================
   registerSeller(
     name: string,
     email: string,
@@ -46,9 +58,9 @@ export class SellerService {
     );
   }
 
-  // =========================
-  // LOGIN SELLER
-  // =========================
+  // =====================================================
+  // LOGIN
+  // =====================================================
   authenticateSeller(
     email: string,
     password: string
@@ -63,12 +75,48 @@ export class SellerService {
     );
   }
 
-  // =========================
-  // ADD PRODUCT
-  // =========================
-  addProduct(
-    data: Product
-  ): Observable<Product> {
+  // =====================================================
+  // USER SIGNUP / LOGIN
+  // =====================================================
+  userSignup(data: Record<string, unknown>): Observable<AuthResponse> {
+
+    const email =
+      String(data['email'] ?? '').trim().toLowerCase();
+
+    const password =
+      String(data['password'] ?? '').trim();
+
+    const name =
+      String(data['name'] ?? '').trim();
+
+    if (name.length > 0) {
+      return this.registerSeller(
+        name,
+        email,
+        password
+      );
+    }
+
+    return this.authenticateSeller(
+      email,
+      password
+    );
+  }
+
+  // =====================================================
+  // GET PRODUCTS - PUBLIC
+  // =====================================================
+  productList(): Observable<Product[]> {
+
+    return this.http.get<Product[]>(
+      `${this.baseUrl}/products`
+    );
+  }
+
+  // =====================================================
+  // ADD PRODUCT - JWT REQUIRED
+  // =====================================================
+  addProduct(data: Product): Observable<Product> {
 
     return this.http.post<Product>(
       `${this.baseUrl}/products`,
@@ -79,9 +127,9 @@ export class SellerService {
     );
   }
 
-  // =========================
-  // UPDATE PRODUCT
-  // =========================
+  // =====================================================
+  // UPDATE PRODUCT - JWT REQUIRED
+  // =====================================================
   updateProduct(
     id: number,
     data: Product
@@ -96,42 +144,16 @@ export class SellerService {
     );
   }
 
-  // =========================
-  // DELETE PRODUCT
-  // =========================
-  deleteProduct(
-    id: number
-  ): Observable<void> {
+  // =====================================================
+  // DELETE PRODUCT - JWT REQUIRED
+  // =====================================================
+  deleteProduct(id: number): Observable<any> {
 
-    return this.http.delete<void>(
+    return this.http.delete(
       `${this.baseUrl}/products/${id}`,
       {
         headers: this.getAuthHeaders()
       }
     );
-  }
-
-  // =========================
-  // GET PRODUCTS
-  // =========================
-  productList(): Observable<Product[]> {
-
-    return this.http.get<Product[]>(
-      `${this.baseUrl}/products`
-    );
-  }
-
-  // =========================
-  // JWT HEADER
-  // =========================
-  private getAuthHeaders() {
-
-    const token =
-      localStorage.getItem('novacart-token');
-
-    return {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    };
   }
 }
