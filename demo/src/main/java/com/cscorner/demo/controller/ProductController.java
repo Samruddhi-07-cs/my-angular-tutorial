@@ -4,60 +4,44 @@ import com.cscorner.demo.entity.Product;
 import com.cscorner.demo.service.ProductService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
-@CrossOrigin(
-    origins = {
-        "https://my-angular-tutorial-production-4383.up.railway.app",
+@CrossOrigin(origins = {
         "http://localhost:4200",
-        "http://localhost:4201"
-    },
-    methods = {
-        RequestMethod.GET,
-        RequestMethod.POST,
-        RequestMethod.PUT,
-        RequestMethod.DELETE,
-        RequestMethod.OPTIONS
-    }
-)
+        "https://my-angular-tutorial-production-4383.up.railway.app"
+})
 public class ProductController {
 
     @Autowired
     private ProductService service;
 
-    // =========================
-    // GET ALL PRODUCTS
-    // =========================
     @GetMapping
     public List<Product> getAllProducts() {
         return service.getAllProducts();
     }
 
-    // =========================
-    // GET PRODUCT BY ID
-    // =========================
     @GetMapping("/{id}")
     public Product getProduct(@PathVariable Long id) {
         return service.getProductById(id);
     }
 
-    // =========================
-    // ADD PRODUCT
-    // =========================
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
     public Product addProduct(@RequestBody Product product) {
         return service.saveProduct(product);
     }
 
-    // =========================
-    // UPDATE PRODUCT
-    // =========================
     @PutMapping("/{id}")
     public Product updateProduct(
             @PathVariable Long id,
@@ -67,11 +51,7 @@ public class ProductController {
         return service.saveProduct(product);
     }
 
-    // =========================
-    // DELETE PRODUCT
-    // =========================
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProduct(@PathVariable Long id) {
         service.deleteProduct(id);
     }
