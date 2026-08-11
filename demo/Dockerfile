@@ -1,12 +1,34 @@
-FROM eclipse-temurin:17-jdk
+# =========================
+# BUILD STAGE
+# =========================
+FROM maven:3.9.9-eclipse-temurin-17 AS build
 
 WORKDIR /app
 
-COPY . .
+# Copy Maven project files
+COPY demo/pom.xml .
 
-RUN chmod +x mvnw
-RUN ./mvnw clean package -DskipTests
+# Download dependencies
+RUN mvn dependency:go-offline -B
 
+# Copy source code
+COPY demo/src ./src
+
+# Build Spring Boot application
+RUN mvn clean package -DskipTests
+
+
+# =========================
+# RUN STAGE
+# =========================
+FROM eclipse-temurin:17-jre
+
+WORKDIR /app
+
+# Copy generated JAR
+COPY --from=build /app/target/*.jar app.jar
+
+# Railway uses the PORT environment variable
 EXPOSE 8080
 
-CMD ["java","-jar","target/demo-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
