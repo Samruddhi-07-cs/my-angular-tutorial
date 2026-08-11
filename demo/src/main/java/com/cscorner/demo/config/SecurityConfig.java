@@ -4,6 +4,7 @@ import com.cscorner.demo.security.JwtAuthenticationFilter;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -31,11 +32,14 @@ public class SecurityConfig {
             throws Exception {
 
         http
+
             // Disable CSRF because this is a JWT REST API
             .csrf(csrf -> csrf.disable())
 
             // Enable CORS
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .cors(cors ->
+                cors.configurationSource(corsConfigurationSource())
+            )
 
             // No HTTP session
             .sessionManagement(session ->
@@ -49,20 +53,28 @@ public class SecurityConfig {
 
                 // CORS preflight
                 .requestMatchers(
-                    org.springframework.http.HttpMethod.OPTIONS,
+                    HttpMethod.OPTIONS,
                     "/**"
                 ).permitAll()
 
                 // Login and registration are public
-                .requestMatchers("/api/auth/**").permitAll()
-
-                // Product GET requests are public
                 .requestMatchers(
-                    org.springframework.http.HttpMethod.GET,
+                    "/api/auth/**"
+                ).permitAll()
+
+                // GET products are public
+                .requestMatchers(
+                    HttpMethod.GET,
                     "/api/products/**"
                 ).permitAll()
 
-                // Everything else requires JWT
+                // TEMPORARY: allow POST products for testing
+                .requestMatchers(
+                    HttpMethod.POST,
+                    "/api/products"
+                ).permitAll()
+
+                // PUT and DELETE still require JWT
                 .anyRequest().authenticated()
             )
 
@@ -75,6 +87,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
@@ -82,9 +95,13 @@ public class SecurityConfig {
             new CorsConfiguration();
 
         configuration.setAllowedOrigins(Arrays.asList(
+
             "https://my-angular-tutorial-production-4383.up.railway.app",
+
             "https://my-angular-tutorial-production-f731.up.railway.app",
+
             "http://localhost:4200",
+
             "http://localhost:4201"
         ));
 
