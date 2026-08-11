@@ -8,9 +8,7 @@ import { Product } from '../product';
 })
 export class ProductService {
 
-  private apiUrl =
-    'https://my-angular-tutorial-production.up.railway.app/api/products';
-
+ private apiUrl = 'https://pleasing-motivation-production-caad.up.railway.app/api/products';
   constructor(private http: HttpClient) {}
 
   private getHeaders(): HttpHeaders {
