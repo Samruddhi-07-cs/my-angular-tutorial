@@ -8,51 +8,101 @@ import { Product } from '../product';
 })
 export class ProductService {
 
- private apiUrl = 'https://pleasing-motivation-production-caad.up.railway.app/api/products';
+  private apiUrl =
+    'https://pleasing-motivation-production-caad.up.railway.app/api/products';
+
   constructor(private http: HttpClient) {}
 
+  // =========================================================
+  // GET AUTHENTICATION HEADERS
+  // =========================================================
   private getHeaders(): HttpHeaders {
-    const token = localStorage.getItem('novacart-auth-token');
+
+    // IMPORTANT:
+    // Use the same localStorage key used by SellerService/login
+    const token = localStorage.getItem('novacart-token');
+
+    console.log('JWT token being sent:', token);
 
     return new HttpHeaders({
       'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {})
+
+      ...(token
+        ? {
+            Authorization: `Bearer ${token}`
+          }
+        : {})
     });
   }
 
-  // GET - public
+
+  // =========================================================
+  // GET ALL PRODUCTS - PUBLIC
+  // =========================================================
   getProducts(): Observable<Product[]> {
-    return this.http.get<Product[]>(this.apiUrl);
+
+    return this.http.get<Product[]>(
+      this.apiUrl
+    );
   }
 
-  // GET by ID - public
+
+  // =========================================================
+  // GET PRODUCT BY ID - PUBLIC
+  // =========================================================
   getProduct(id: number): Observable<Product> {
-    return this.http.get<Product>(`${this.apiUrl}/${id}`);
+
+    return this.http.get<Product>(
+      `${this.apiUrl}/${id}`
+    );
   }
 
-  // POST - authenticated
+
+  // =========================================================
+  // ADD PRODUCT - AUTHENTICATED
+  // =========================================================
   addProduct(product: Product): Observable<Product> {
+
     return this.http.post<Product>(
       this.apiUrl,
       product,
-      { headers: this.getHeaders() }
+      {
+        headers: this.getHeaders()
+      }
     );
   }
 
-  // PUT - authenticated
-  updateProduct(id: number, product: Product): Observable<Product> {
+
+  // =========================================================
+  // UPDATE PRODUCT - AUTHENTICATED
+  // =========================================================
+  updateProduct(
+    id: number,
+    product: Product
+  ): Observable<Product> {
+
     return this.http.put<Product>(
       `${this.apiUrl}/${id}`,
       product,
-      { headers: this.getHeaders() }
+      {
+        headers: this.getHeaders()
+      }
     );
   }
 
-  // DELETE - authenticated
-  deleteProduct(id: number): Observable<void> {
+
+  // =========================================================
+  // DELETE PRODUCT - AUTHENTICATED
+  // =========================================================
+  deleteProduct(
+    id: number
+  ): Observable<void> {
+
     return this.http.delete<void>(
       `${this.apiUrl}/${id}`,
-      { headers: this.getHeaders() }
+      {
+        headers: this.getHeaders()
+      }
     );
   }
 }
