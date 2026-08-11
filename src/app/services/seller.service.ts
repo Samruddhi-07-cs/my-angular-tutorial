@@ -20,7 +20,7 @@ interface SellerRecord {
 export class SellerService {
 
   private readonly baseUrl =
-    'https://my-angular-tutorial-production-4383.up.railway.app/api';
+  'https://pleasing-motivation-production-caad.up.railway.app/api';
 
   constructor(private http: HttpClient) {}
 
