@@ -6,13 +6,13 @@ FROM maven:3.9.9-eclipse-temurin-17 AS build
 WORKDIR /app
 
 # Copy Maven project files
-COPY demo/pom.xml .
+COPY pom.xml .
 
 # Download dependencies
 RUN mvn dependency:go-offline -B
 
 # Copy source code
-COPY demo/src ./src
+COPY src ./src
 
 # Build Spring Boot application
 RUN mvn clean package -DskipTests
@@ -28,7 +28,7 @@ WORKDIR /app
 # Copy generated JAR
 COPY --from=build /app/target/*.jar app.jar
 
-# Railway uses the PORT environment variable
+# Render will provide the PORT environment variable
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["sh", "-c", "java -jar app.jar --server.port=${PORT:-8080}"]
