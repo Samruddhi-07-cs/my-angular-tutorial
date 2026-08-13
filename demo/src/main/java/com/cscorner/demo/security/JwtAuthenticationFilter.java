@@ -28,62 +28,88 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private UserRepository userRepository;
 
 
+    // =====================================================
+    // DECIDE WHICH REQUESTS SHOULD SKIP JWT FILTER
+    // =====================================================
+
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
+    protected boolean shouldNotFilter(
+            HttpServletRequest request) {
 
         String path = request.getServletPath();
         String method = request.getMethod();
 
-        // ============================================
-        // PUBLIC AUTH APIs
-        // ============================================
+
+        // =================================================
+        // PUBLIC AUTH ENDPOINTS
+        // =================================================
+
         if (path.startsWith("/api/auth/")) {
             return true;
         }
 
-        // ============================================
-        // PUBLIC HEALTH CHECK
-        // ============================================
+
+        // =================================================
+        // PUBLIC HEALTH ENDPOINT
+        // =================================================
+
         if (path.equals("/api/health")) {
             return true;
         }
 
-        // ============================================
+
+        // =================================================
         // PUBLIC ROOT
-        // ============================================
+        // =================================================
+
         if (path.equals("/")) {
             return true;
         }
 
-        // ============================================
+
+        // =================================================
         // PUBLIC GET PRODUCTS
-        // ============================================
+        // =================================================
+
         if (path.equals("/api/products")
                 && method.equalsIgnoreCase("GET")) {
+
             return true;
         }
 
-        // ============================================
+
+        // =================================================
         // PUBLIC GET SINGLE PRODUCT
-        // ============================================
+        // =================================================
+
         if (path.startsWith("/api/products/")
                 && method.equalsIgnoreCase("GET")) {
+
             return true;
         }
 
-        // ============================================
+
+        // =================================================
         // CORS PREFLIGHT
-        // ============================================
+        // =================================================
+
         if (method.equalsIgnoreCase("OPTIONS")) {
             return true;
         }
 
-        // ============================================
-        // POST / PUT / DELETE REQUIRE JWT
-        // ============================================
+
+        // =================================================
+        // POST / PUT / DELETE
+        // CONTINUE THROUGH JWT FILTER
+        // =================================================
+
         return false;
     }
 
+
+    // =====================================================
+    // JWT AUTHENTICATION
+    // =====================================================
 
     @Override
     protected void doFilterInternal(
@@ -92,63 +118,86 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain)
             throws ServletException, IOException {
 
-        String authHeader = request.getHeader("Authorization");
 
-        // ============================================
-        // NO TOKEN
-        // ============================================
+        String authHeader =
+                request.getHeader("Authorization");
+
+
+        // =================================================
+        // NO AUTHORIZATION HEADER
+        // =================================================
+
         if (authHeader == null || authHeader.isBlank()) {
 
             System.out.println(
-                    "JWT FILTER: No Authorization header for "
-                    + request.getMethod()
-                    + " "
-                    + request.getServletPath()
+                "JWT FILTER: No Authorization header for "
+                + request.getMethod()
+                + " "
+                + request.getServletPath()
             );
 
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json");
+            response.setStatus(
+                HttpServletResponse.SC_UNAUTHORIZED
+            );
+
+            response.setContentType(
+                "application/json"
+            );
 
             response.getWriter().write(
-                    "{\"message\":\"Authorization token is missing\"}"
+                "{\"message\":\"Authorization token is missing\"}"
             );
 
             return;
         }
 
 
-        // ============================================
-        // INVALID BEARER HEADER
-        // ============================================
+        // =================================================
+        // INVALID AUTHORIZATION HEADER
+        // =================================================
+
         if (!authHeader.startsWith("Bearer ")) {
 
             System.out.println(
-                    "JWT FILTER: Invalid Authorization header"
+                "JWT FILTER: Invalid Authorization header"
             );
 
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json");
+            response.setStatus(
+                HttpServletResponse.SC_UNAUTHORIZED
+            );
+
+            response.setContentType(
+                "application/json"
+            );
 
             response.getWriter().write(
-                    "{\"message\":\"Invalid Authorization header\"}"
+                "{\"message\":\"Invalid Authorization header\"}"
             );
 
             return;
         }
 
 
-        // ============================================
-        // EXTRACT TOKEN
-        // ============================================
-        String token = authHeader.substring(7).trim();
+        // =================================================
+        // EXTRACT JWT TOKEN
+        // =================================================
+
+        String token =
+                authHeader.substring(7).trim();
+
 
         if (token.isEmpty()) {
 
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json");
+            response.setStatus(
+                HttpServletResponse.SC_UNAUTHORIZED
+            );
+
+            response.setContentType(
+                "application/json"
+            );
 
             response.getWriter().write(
-                    "{\"message\":\"JWT token is empty\"}"
+                "{\"message\":\"JWT token is empty\"}"
             );
 
             return;
@@ -157,104 +206,132 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
 
-            // ============================================
-            // GET EMAIL FROM TOKEN
-            // ============================================
-            String email = jwtUtil.extractUsername(token);
+            // =============================================
+            // EXTRACT EMAIL FROM JWT
+            // =============================================
+
+            String email =
+                    jwtUtil.extractUsername(token);
 
             System.out.println(
-                    "JWT FILTER: Email from token = " + email
+                "JWT FILTER: Email from token = "
+                + email
             );
 
 
             if (email == null || email.isBlank()) {
 
-                response.setStatus(
-                        HttpServletResponse.SC_UNAUTHORIZED
+                System.out.println(
+                    "JWT FILTER: Could not extract email"
                 );
 
-                response.setContentType("application/json");
+                response.setStatus(
+                    HttpServletResponse.SC_UNAUTHORIZED
+                );
+
+                response.setContentType(
+                    "application/json"
+                );
 
                 response.getWriter().write(
-                        "{\"message\":\"Invalid JWT token\"}"
+                    "{\"message\":\"Invalid JWT token\"}"
                 );
 
                 return;
             }
 
 
-            // ============================================
-            // FIND USER
-            // ============================================
-            User user = userRepository
-                    .findByEmail(email)
-                    .orElse(null);
+            // =============================================
+            // FIND USER IN DATABASE
+            // =============================================
+
+            User user =
+                    userRepository
+                        .findByEmail(email)
+                        .orElse(null);
 
 
             if (user == null) {
 
                 System.out.println(
-                        "JWT FILTER: User not found for email = "
-                        + email
+                    "JWT FILTER: User not found for email = "
+                    + email
                 );
 
                 response.setStatus(
-                        HttpServletResponse.SC_UNAUTHORIZED
+                    HttpServletResponse.SC_UNAUTHORIZED
                 );
 
-                response.setContentType("application/json");
+                response.setContentType(
+                    "application/json"
+                );
 
                 response.getWriter().write(
-                        "{\"message\":\"User not found\"}"
+                    "{\"message\":\"User not found\"}"
                 );
 
                 return;
             }
 
 
-            // ============================================
-            // AUTHENTICATE USER
-            // ============================================
+            // =============================================
+            // CREATE AUTHENTICATION
+            // =============================================
+
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
-                            user,
-                            null,
-                            List.of(
-                                    new SimpleGrantedAuthority(
-                                            "ROLE_" + user.getRole()
-                                    )
+                        user,
+                        null,
+                        List.of(
+                            new SimpleGrantedAuthority(
+                                "ROLE_" + user.getRole()
                             )
+                        )
                     );
 
 
+            // =============================================
+            // SET AUTHENTICATION
+            // =============================================
+
             SecurityContextHolder
-                    .getContext()
-                    .setAuthentication(authentication);
+                .getContext()
+                .setAuthentication(authentication);
 
 
             System.out.println(
-                    "JWT FILTER: Authentication successful for "
-                    + email
+                "JWT FILTER: Authentication successful for "
+                + email
             );
 
 
-            filterChain.doFilter(request, response);
+            // =============================================
+            // CONTINUE REQUEST
+            // =============================================
+
+            filterChain.doFilter(
+                request,
+                response
+            );
+
 
         } catch (Exception e) {
 
             System.out.println(
-                    "JWT FILTER ERROR: "
-                    + e.getMessage()
+                "JWT FILTER ERROR: "
+                + e.getMessage()
             );
 
             response.setStatus(
-                    HttpServletResponse.SC_UNAUTHORIZED
+                HttpServletResponse.SC_UNAUTHORIZED
             );
 
-            response.setContentType("application/json");
+            response.setContentType(
+                "application/json"
+            );
 
             response.getWriter().write(
-                    "{\"message\":\"Invalid or expired JWT token\"}"
+                "{\"message\":\"Invalid or expired JWT token\"}"
             );
         }
     }

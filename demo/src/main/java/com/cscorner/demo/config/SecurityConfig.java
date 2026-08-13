@@ -27,85 +27,60 @@ public class SecurityConfig {
         this.jwtFilter = jwtFilter;
     }
 
-
     @Bean
-    public SecurityFilterChain securityFilterChain(
-            HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http)
+            throws Exception {
 
         http
-
-            // ============================================
-            // JWT API - CSRF DISABLED
-            // ============================================
+            // JWT API does not use CSRF
             .csrf(csrf -> csrf.disable())
 
-            // ============================================
-            // CORS
-            // ============================================
+            // Enable CORS
             .cors(cors ->
-                    cors.configurationSource(
-                            corsConfigurationSource()
-                    )
+                cors.configurationSource(corsConfigurationSource())
             )
 
-            // ============================================
-            // STATELESS
-            // ============================================
+            // JWT = stateless
             .sessionManagement(session ->
-                    session.sessionCreationPolicy(
-                            SessionCreationPolicy.STATELESS
-                    )
+                session.sessionCreationPolicy(
+                    SessionCreationPolicy.STATELESS
+                )
             )
 
-            // ============================================
-            // AUTHORIZATION
-            // ============================================
             .authorizeHttpRequests(auth -> auth
 
-                // CORS
+                // CORS preflight
                 .requestMatchers(
-                        HttpMethod.OPTIONS,
-                        "/**"
+                    HttpMethod.OPTIONS,
+                    "/**"
                 ).permitAll()
 
-                // ROOT
+                // Login + registration
                 .requestMatchers(
-                        "/"
+                    "/api/auth/**"
                 ).permitAll()
 
-                // HEALTH
+                // Public product GET requests
                 .requestMatchers(
-                        "/api/health"
+                    HttpMethod.GET,
+                    "/api/products/**"
                 ).permitAll()
 
-                // LOGIN + REGISTER
+                // Product creation
+                // Keep this public for your current testing
                 .requestMatchers(
-                        "/api/auth/**"
+                    HttpMethod.POST,
+                    "/api/products"
                 ).permitAll()
 
-                // GET PRODUCTS
-                .requestMatchers(
-                        HttpMethod.GET,
-                        "/api/products/**"
-                ).permitAll()
-
-                // TEMPORARY - POST PRODUCT
-                // Keep this because you are testing product creation
-                .requestMatchers(
-                        HttpMethod.POST,
-                        "/api/products"
-                ).permitAll()
-
-                // EVERYTHING ELSE NEEDS JWT
+                // Everything else requires JWT
                 .anyRequest().authenticated()
             )
 
-            // ============================================
-            // JWT FILTER
-            // ============================================
+            // JWT filter
             .addFilterBefore(
-                    jwtFilter,
-                    UsernamePasswordAuthenticationFilter.class
+                jwtFilter,
+                UsernamePasswordAuthenticationFilter.class
             );
 
         return http.build();
@@ -116,47 +91,42 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
 
         CorsConfiguration configuration =
-                new CorsConfiguration();
+            new CorsConfiguration();
 
         configuration.setAllowedOrigins(Arrays.asList(
 
-                // YOUR RENDER FRONTEND
-                "https://novacart-frontend-wvbi.onrender.com",
+            // Your CURRENT Render frontend
+            "https://novacart-frontend-wvbi.onrender.com",
 
-                // OLD RAILWAY URLS - can remain temporarily
-                "https://my-angular-tutorial-production-4383.up.railway.app",
-
-                "https://my-angular-tutorial-production-f731.up.railway.app",
-
-                // LOCAL DEVELOPMENT
-                "http://localhost:4200",
-                "http://localhost:4201"
+            // Local Angular development
+            "http://localhost:4200",
+            "http://localhost:4201"
         ));
 
         configuration.setAllowedMethods(Arrays.asList(
-                "GET",
-                "POST",
-                "PUT",
-                "DELETE",
-                "OPTIONS"
+            "GET",
+            "POST",
+            "PUT",
+            "DELETE",
+            "OPTIONS"
         ));
 
         configuration.setAllowedHeaders(Arrays.asList(
-                "Authorization",
-                "Content-Type",
-                "Accept",
-                "Origin",
-                "X-Requested-With"
+            "Authorization",
+            "Content-Type",
+            "Accept",
+            "Origin",
+            "X-Requested-With"
         ));
 
         configuration.setAllowCredentials(false);
 
         UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
+            new UrlBasedCorsConfigurationSource();
 
         source.registerCorsConfiguration(
-                "/**",
-                configuration
+            "/**",
+            configuration
         );
 
         return source;
