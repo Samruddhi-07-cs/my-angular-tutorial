@@ -22,20 +22,49 @@ public class ProductController {
     @Autowired
     private ProductService service;
 
+
+    // =========================================================
+    // GET ALL PRODUCTS
+    // PUBLIC
+    // =========================================================
+
     @GetMapping
     public List<Product> getAllProducts() {
+
         return service.getAllProducts();
     }
 
+
+    // =========================================================
+    // GET PRODUCT BY ID
+    // PUBLIC
+    // =========================================================
+
     @GetMapping("/{id}")
-    public Product getProduct(@PathVariable Long id) {
+    public Product getProduct(
+            @PathVariable Long id) {
+
         return service.getProductById(id);
     }
 
+
+    // =========================================================
+    // ADD PRODUCT
+    // JWT REQUIRED
+    // =========================================================
+
     @PostMapping
-    public Product addProduct(@RequestBody Product product) {
+    public Product addProduct(
+            @RequestBody Product product) {
+
         return service.saveProduct(product);
     }
+
+
+    // =========================================================
+    // UPDATE PRODUCT
+    // JWT REQUIRED
+    // =========================================================
 
     @PutMapping("/{id}")
     public Product updateProduct(
@@ -43,11 +72,20 @@ public class ProductController {
             @RequestBody Product product) {
 
         product.setId(id);
+
         return service.saveProduct(product);
     }
 
+
+    // =========================================================
+    // DELETE PRODUCT
+    // JWT REQUIRED
+    // =========================================================
+
     @DeleteMapping("/{id}")
-    public void deleteProduct(@PathVariable Long id) {
+    public void deleteProduct(
+            @PathVariable Long id) {
+
         service.deleteProduct(id);
     }
 }

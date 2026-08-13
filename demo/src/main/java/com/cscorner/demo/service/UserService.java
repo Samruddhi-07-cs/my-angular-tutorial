@@ -16,44 +16,103 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+
+    // =========================================================
+    // REGISTER
+    // =========================================================
+
     public User register(User user) {
 
-        if (repository.findByEmail(user.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already exists");
+        String email =
+                user.getEmail()
+                    .trim()
+                    .toLowerCase();
+
+
+        // -----------------------------------------------------
+        // CHECK EMAIL
+        // -----------------------------------------------------
+
+        if (repository.findByEmail(email).isPresent()) {
+
+            throw new RuntimeException(
+                "Email already exists"
+            );
         }
 
+
+        // -----------------------------------------------------
+        // SAVE NORMALIZED EMAIL
+        // -----------------------------------------------------
+
+        user.setEmail(email);
+
+
+        // -----------------------------------------------------
+        // ENCODE PASSWORD
+        // -----------------------------------------------------
+
         user.setPassword(
-                passwordEncoder.encode(user.getPassword())
+            passwordEncoder.encode(
+                user.getPassword()
+            )
         );
 
-        if (user.getRole() == null ||
-                user.getRole().isEmpty()) {
+
+        // -----------------------------------------------------
+        // DEFAULT ROLE
+        // -----------------------------------------------------
+
+        if (user.getRole() == null
+                || user.getRole().isEmpty()) {
 
             user.setRole("SELLER");
         }
 
+
+        // -----------------------------------------------------
+        // SAVE USER
+        // -----------------------------------------------------
+
         return repository.save(user);
     }
+
+
+    // =========================================================
+    // LOGIN
+    // =========================================================
 
     public User login(
             String email,
             String password) {
 
-        User user = repository.findByEmail(email)
-                .orElseThrow(
+        String normalizedEmail =
+                email.trim().toLowerCase();
+
+
+        User user =
+                repository
+                    .findByEmail(normalizedEmail)
+                    .orElseThrow(
                         () -> new RuntimeException(
-                                "User not found"
+                            "User not found"
                         )
-                );
+                    );
+
+
+        // -----------------------------------------------------
+        // CHECK PASSWORD
+        // -----------------------------------------------------
 
         if (!passwordEncoder.matches(
                 password,
                 user.getPassword())) {
 
             throw new RuntimeException(
-                    "Invalid Password"
+                "Invalid Password"
             );
         }
+
 
         return user;
     }

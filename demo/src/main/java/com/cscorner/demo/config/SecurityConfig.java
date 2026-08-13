@@ -28,68 +28,107 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)
-            throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http) throws Exception {
 
         http
-            // JWT REST API - CSRF not required
+
+            // =====================================================
+            // DISABLE CSRF
+            // JWT REST API does not use session-based CSRF
+            // =====================================================
             .csrf(csrf -> csrf.disable())
 
-            // Enable CORS
+            // =====================================================
+            // ENABLE CORS
+            // =====================================================
             .cors(cors ->
                 cors.configurationSource(corsConfigurationSource())
             )
 
-            // JWT = stateless
+            // =====================================================
+            // STATELESS SESSION
+            // =====================================================
             .sessionManagement(session ->
                 session.sessionCreationPolicy(
                     SessionCreationPolicy.STATELESS
                 )
             )
 
-            // Authorization rules
+            // =====================================================
+            // AUTHORIZATION RULES
+            // =====================================================
             .authorizeHttpRequests(auth -> auth
 
+                // -------------------------------------------------
+                // Root endpoint
+                // -------------------------------------------------
+                .requestMatchers("/")
+                .permitAll()
+
+                // -------------------------------------------------
                 // CORS preflight
+                // -------------------------------------------------
                 .requestMatchers(
                     HttpMethod.OPTIONS,
                     "/**"
-                ).permitAll()
+                )
+                .permitAll()
 
-                // LOGIN + REGISTER
+                // -------------------------------------------------
+                // Login and Registration
+                // -------------------------------------------------
                 .requestMatchers(
                     "/api/auth/**"
-                ).permitAll()
+                )
+                .permitAll()
 
-                // PUBLIC PRODUCT GET
+                // -------------------------------------------------
+                // Public GET products
+                // -------------------------------------------------
                 .requestMatchers(
                     HttpMethod.GET,
                     "/api/products/**"
-                ).permitAll()
+                )
+                .permitAll()
 
-                // PRODUCT ADD
+                // -------------------------------------------------
+                // Add product requires JWT
+                // -------------------------------------------------
                 .requestMatchers(
                     HttpMethod.POST,
                     "/api/products"
-                ).authenticated()
+                )
+                .authenticated()
 
-                // PRODUCT UPDATE
+                // -------------------------------------------------
+                // Update product requires JWT
+                // -------------------------------------------------
                 .requestMatchers(
                     HttpMethod.PUT,
                     "/api/products/**"
-                ).authenticated()
+                )
+                .authenticated()
 
-                // PRODUCT DELETE
+                // -------------------------------------------------
+                // Delete product requires JWT
+                // -------------------------------------------------
                 .requestMatchers(
                     HttpMethod.DELETE,
                     "/api/products/**"
-                ).authenticated()
+                )
+                .authenticated()
 
-                // Everything else
-                .anyRequest().authenticated()
+                // -------------------------------------------------
+                // Everything else requires authentication
+                // -------------------------------------------------
+                .anyRequest()
+                .authenticated()
             )
 
-            // JWT filter
+            // =====================================================
+            // JWT FILTER
+            // =====================================================
             .addFilterBefore(
                 jwtFilter,
                 UsernamePasswordAuthenticationFilter.class
@@ -99,6 +138,10 @@ public class SecurityConfig {
     }
 
 
+    // =============================================================
+    // CORS CONFIGURATION
+    // =============================================================
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
@@ -107,17 +150,16 @@ public class SecurityConfig {
 
         configuration.setAllowedOrigins(Arrays.asList(
 
-            // =================================================
-            // CURRENT RENDER FRONTEND
-            // =================================================
+            // -----------------------------------------------------
+            // YOUR CURRENT RENDER FRONTEND
+            // -----------------------------------------------------
             "https://novacart-frontend-wvbi.onrender.com",
 
-            // =================================================
-            // LOCAL ANGULAR
-            // =================================================
+            // -----------------------------------------------------
+            // LOCAL ANGULAR DEVELOPMENT
+            // -----------------------------------------------------
             "http://localhost:4200",
             "http://localhost:4201"
-
         ));
 
         configuration.setAllowedMethods(Arrays.asList(
@@ -134,10 +176,6 @@ public class SecurityConfig {
             "Accept",
             "Origin",
             "X-Requested-With"
-        ));
-
-        configuration.setExposedHeaders(Arrays.asList(
-            "Authorization"
         ));
 
         configuration.setAllowCredentials(false);
