@@ -32,53 +32,43 @@ public class SecurityConfig {
             throws Exception {
 
         http
-
-            // Disable CSRF because this is a JWT REST API
             .csrf(csrf -> csrf.disable())
 
-            // Enable CORS
             .cors(cors ->
                 cors.configurationSource(corsConfigurationSource())
             )
 
-            // No HTTP session
             .sessionManagement(session ->
                 session.sessionCreationPolicy(
                     SessionCreationPolicy.STATELESS
                 )
             )
 
-            // API authorization
             .authorizeHttpRequests(auth -> auth
 
-                // CORS preflight
                 .requestMatchers(
                     HttpMethod.OPTIONS,
                     "/**"
                 ).permitAll()
 
-                // Login and registration are public
                 .requestMatchers(
                     "/api/auth/**"
                 ).permitAll()
 
-                // GET products are public
                 .requestMatchers(
                     HttpMethod.GET,
                     "/api/products/**"
                 ).permitAll()
 
-                // TEMPORARY: allow POST products for testing
+                // Temporary testing permission
                 .requestMatchers(
                     HttpMethod.POST,
                     "/api/products"
                 ).permitAll()
 
-                // PUT and DELETE still require JWT
                 .anyRequest().authenticated()
             )
 
-            // JWT filter
             .addFilterBefore(
                 jwtFilter,
                 UsernamePasswordAuthenticationFilter.class
@@ -86,7 +76,6 @@ public class SecurityConfig {
 
         return http.build();
     }
-
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -96,9 +85,7 @@ public class SecurityConfig {
 
         configuration.setAllowedOrigins(Arrays.asList(
 
-            "https://my-angular-tutorial-production-4383.up.railway.app",
-
-            "https://my-angular-tutorial-production-f731.up.railway.app",
+            "https://novacart-frontend-wvbi.onrender.com",
 
             "http://localhost:4200",
 

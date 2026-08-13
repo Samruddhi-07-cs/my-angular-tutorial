@@ -20,7 +20,7 @@ import java.util.List;
 @RequestMapping("/api/products")
 @CrossOrigin(origins = {
         "http://localhost:4200",
-        "https://my-angular-tutorial-production-4383.up.railway.app"
+        "https://novacart-frontend-wvbi.onrender.com"
 })
 public class ProductController {
 
