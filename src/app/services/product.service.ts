@@ -9,7 +9,7 @@ import { Product } from '../product';
 export class ProductService {
 
   private apiUrl =
-    'https://pleasing-motivation-production-caad.up.railway.app/api/products';
+    'https://novacart-api-nlq8.onrender.com/api/products';
 
   constructor(private http: HttpClient) {}
 
@@ -18,8 +18,6 @@ export class ProductService {
   // =========================================================
   private getHeaders(): HttpHeaders {
 
-    // IMPORTANT:
-    // Use the same localStorage key used by SellerService/login
     const token = localStorage.getItem('novacart-token');
 
     console.log('JWT token being sent:', token);
@@ -35,7 +33,6 @@ export class ProductService {
     });
   }
 
-
   // =========================================================
   // GET ALL PRODUCTS - PUBLIC
   // =========================================================
@@ -46,7 +43,6 @@ export class ProductService {
     );
   }
 
-
   // =========================================================
   // GET PRODUCT BY ID - PUBLIC
   // =========================================================
@@ -56,7 +52,6 @@ export class ProductService {
       `${this.apiUrl}/${id}`
     );
   }
-
 
   // =========================================================
   // ADD PRODUCT - AUTHENTICATED
@@ -71,7 +66,6 @@ export class ProductService {
       }
     );
   }
-
 
   // =========================================================
   // UPDATE PRODUCT - AUTHENTICATED
@@ -89,7 +83,6 @@ export class ProductService {
       }
     );
   }
-
 
   // =========================================================
   // DELETE PRODUCT - AUTHENTICATED

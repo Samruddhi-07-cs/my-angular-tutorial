@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Product } from '../product';
 
 export interface AuthResponse {
@@ -20,7 +20,7 @@ interface SellerRecord {
 export class SellerService {
 
   private readonly baseUrl =
-  'https://pleasing-motivation-production-caad.up.railway.app/api';
+    'https://novacart-api-nlq8.onrender.com/api';
 
   constructor(private http: HttpClient) {}
 
@@ -78,7 +78,9 @@ export class SellerService {
   // =====================================================
   // USER SIGNUP / LOGIN
   // =====================================================
-  userSignup(data: Record<string, unknown>): Observable<AuthResponse> {
+  userSignup(
+    data: Record<string, unknown>
+  ): Observable<AuthResponse> {
 
     const email =
       String(data['email'] ?? '').trim().toLowerCase();
@@ -116,7 +118,9 @@ export class SellerService {
   // =====================================================
   // ADD PRODUCT - JWT REQUIRED
   // =====================================================
-  addProduct(data: Product): Observable<Product> {
+  addProduct(
+    data: Product
+  ): Observable<Product> {
 
     return this.http.post<Product>(
       `${this.baseUrl}/products`,
@@ -147,7 +151,9 @@ export class SellerService {
   // =====================================================
   // DELETE PRODUCT - JWT REQUIRED
   // =====================================================
-  deleteProduct(id: number): Observable<any> {
+  deleteProduct(
+    id: number
+  ): Observable<any> {
 
     return this.http.delete(
       `${this.baseUrl}/products/${id}`,
