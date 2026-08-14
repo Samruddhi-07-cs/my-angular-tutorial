@@ -55,7 +55,7 @@
         </div>
         <div class="product-footer-actions">
           <button type="button" class="card-btn" (click)="addToCart(product)">Add to Cart</button>
-          <button type="button" class="card-btn secondary" (click)="toggleWishlist(product)">{{ isWishlisted(product) ? '♥' : '♡' }}</button>
+          <button type="button" class="card-btn secondary" [class.active]="isWishlisted(product)" (click)="toggleWishlist(product)">{{ isWishlisted(product) ? '♥' : '♡' }}</button>
         </div>
       </div>
     </article>
@@ -79,7 +79,7 @@
         </div>
         <div class="product-footer-actions">
           <button type="button" class="card-btn" (click)="addToCart(product)">Add to Cart</button>
-          <button type="button" class="card-btn secondary" (click)="toggleWishlist(product)">{{ isWishlisted(product) ? '♥' : '♡' }}</button>
+          <button type="button" class="card-btn secondary" [class.active]="isWishlisted(product)" (click)="toggleWishlist(product)">{{ isWishlisted(product) ? '♥' : '♡' }}</button>
         </div>
       </div>
     </article>
